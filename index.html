@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANG AUTO PRO - CRM SYSTEM</title>
+    <title>SANG AUTO PRO - PREMIUM CRM</title>
     <link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -11,18 +11,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* --- PROFESSIONAL DARK THEME --- */
+        /* --- ULTRA PROFESSIONAL DARK THEME --- */
         :root {
             --primary: #ffffff;
             --accent: #3b82f6;
-            --bg: #000000;
-            --card: #121212;
-            --border: #262626;
-            --text-main: #ffffff;
-            --text-dim: #a3a3a3;
-            --danger: #ff4d4d;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #2563eb);
+            --gold-gradient: linear-gradient(135deg, #f59e0b, #d97706);
+            --green-gradient: linear-gradient(135deg, #10b981, #059669);
+            --bg: #0a0a0a;
+            --card: #151515;
+            --border: #2a2a2a;
+            --text-main: #f3f4f6;
+            --text-dim: #9ca3af;
+            --danger: #ef4444;
             --warning: #f59e0b;
-            --success: #00ff88;
+            --success: #10b981;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,70 +37,117 @@
 
         /* Header */
         .header {
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(12px);
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.5);
         }
-        .header h1 { font-size: 18px; letter-spacing: 4px; font-weight: 900; margin: 0; color: var(--primary); }
-        .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 1px; }
+        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--text-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
         /* Tabs */
-        .tab-content { display: none; animation: slideUp 0.3s ease-out; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Forms & Inputs */
-        .section-title { font-size: 13px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; position: relative; transition: all 0.3s;}
+        .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
+        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
         
-        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
-        input, textarea, select {
-            width: 100%; background: #000; border: 1px solid var(--border);
-            color: #fff; padding: 14px; border-radius: 10px; font-size: 14px; margin-bottom: 15px;
+        .card { 
+            background: linear-gradient(145deg, #181818, #121212); 
+            border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
+            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; }
         
-        .search-bar { background: #1a1a1a; border-radius: 20px; padding: 12px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 15px; width: 100%; color: #fff; }
+        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
+        input, textarea, select {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
+            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        
+        .search-bar { background: #111; border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
 
         /* Image Grid */
-        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .image-item { aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; background: #222; border: 1px solid var(--border); }
+        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); position: relative; }
         .image-item img { width: 100%; height: 100%; object-fit: cover; }
 
         /* Buttons */
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
-        .btn-main { background: var(--primary); color: #000; }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--border); margin-top: 10px; font-size: 12px; padding: 10px;}
-        .btn-check { background: rgba(0, 255, 136, 0.1); color: var(--success); border: 1px solid var(--success); font-size: 12px; padding: 10px; margin-top: 10px; }
+        .btn { 
+            width: 100%; padding: 14px; border: none; border-radius: 12px; 
+            font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-main { background: var(--text-main); color: #000; font-size: 14px; padding: 16px;}
+        .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+        .btn-check { background: rgba(59, 130, 246, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+        .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
 
         /* Bottom Navigation */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9);
+            position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95);
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 80px; padding-bottom: 15px; z-index: 100;
+            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 10px; font-weight: 700; text-decoration: none; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 9px; font-weight: 800; text-decoration: none; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 22px; margin-bottom: 5px; transition: 0.3s;}
+        .nav-item.active .nav-icon { transform: translateY(-3px) scale(1.1); }
 
         /* Tags & Badges */
-        .tag { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; display: inline-block; }
-        .tag-nong { background: rgba(255, 77, 77, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .tag-am { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
-        .tag-nguoi { background: rgba(59, 130, 246, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
+        .tag-nong { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.5); }
+        .tag-am { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.5); }
+        .tag-nguoi { background: rgba(59, 130, 246, 0.15); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.5); }
+        .tag-chot { background: var(--gold-gradient); color: #fff; border: none; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);}
 
-        /* URGENT CUSTOMER ALERT (Nóng + > 2 days) */
-        .card.urgent { border: 2px solid var(--danger); box-shadow: 0 0 15px rgba(255, 77, 77, 0.2); }
-        .urgent-badge { position: absolute; top: -10px; right: -10px; background: var(--danger); color: #fff; font-size: 10px; font-weight: bold; padding: 5px 10px; border-radius: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        /* URGENT CUSTOMER ALERT */
+        .card.urgent { 
+            border: 1px solid var(--danger); 
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); 
+            background: linear-gradient(145deg, #1a1010, #120a0a);
+        }
+        .urgent-badge { 
+            position: absolute; top: -12px; right: 15px; 
+            background: var(--danger); color: #fff; font-size: 10px; font-weight: 900; 
+            padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; 
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5); letter-spacing: 0.5px;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         /* Toast */
-        #toast { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: var(--success); color: #000; padding: 12px 25px; border-radius: 30px; font-weight: bold; font-size: 13px; display: none; z-index: 1000; }
+        #toast { 
+            position: fixed; top: 90px; left: 50%; transform: translateX(-50%); 
+            background: var(--success); color: #fff; padding: 14px 28px; 
+            border-radius: 30px; font-weight: 800; font-size: 13px; display: none; 
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); letter-spacing: 0.5px;
+        }
         
-        .cus-info p { margin: 5px 0; font-size: 13px; color: #ccc;}
-        .cus-info strong { color: #fff; }
+        .cus-info { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
+        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex; align-items: flex-start;}
+        .cus-info strong { color: #fff; margin-left: 5px; flex: 1;}
+
+        /* Zalo Icon Style */
+        .zalo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: #0068ff;
+            border-radius: 5px;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: 0.2s;
+        }
+        .zalo-icon:active { transform: scale(0.9); }
+        .zalo-icon img { width: 14px; height: 14px; }
     </style>
 </head>
 <body>
@@ -106,7 +156,7 @@
 
     <div class="header">
         <h1>SANG AUTO PRO</h1>
-        <span>SMART CRM SYSTEM</span>
+        <span>PREMIUM CRM SYSTEM</span>
     </div>
 
     <div class="container">
@@ -115,7 +165,7 @@
             <h2 class="section-title">Phân loại dữ liệu</h2>
             <div class="card">
                 <label>Bạn đang nhập dữ liệu cho:</label>
-                <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">
+                <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(59, 130, 246, 0.05);">
                     <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
                     <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                 </select>
@@ -140,7 +190,7 @@
                     <input type="text" id="cus-finance-mua" placeholder="VD: Có sẵn 300tr vay bank / Tiền mặt 700tr">
                 </div>
                 <div id="field-finance-ban" style="display: none;">
-                    <label>5. Tình trạng tài chính xe (Ngân hàng / Cầm cố / Gốc)</label>
+                    <label>5. Tình trạng tài chính xe</label>
                     <select id="cus-finance-ban">
                         <option value="Không vay (Gốc)">Không vay (Gốc, Pháp lý chuẩn)</option>
                         <option value="Đang vay Ngân hàng">Đang vay Ngân hàng</option>
@@ -150,9 +200,9 @@
 
                 <label>6. Phân loại khách (Nhãn độ mót)</label>
                 <select id="cus-tag">
-                    <option value="nong">🔥 NÓNG (Cần chốt ngay/Chờ xe)</option>
-                    <option value="am">⚡ ẤM (Đang tham khảo/Đợi tiền)</option>
-                    <option value="nguoi">❄️ NGUỘI (Chưa có nhu cầu gấp)</option>
+                    <option value="nong">🔥 NÓNG (Nhắc nhở sau 2 ngày)</option>
+                    <option value="am">⚡ ẤM (Nhắc nhở sau 7 ngày)</option>
+                    <option value="nguoi">❄️ NGUỘI (Nhắc nhở sau 14 ngày)</option>
                 </select>
 
                 <label>7. <span id="lbl-detail">Thông tin chi tiết yêu cầu</span></label>
@@ -171,13 +221,18 @@
         </div>
 
         <div id="tab-buyers" class="tab-content">
-            <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm tên, SĐT, loại xe mua..." oninput="renderList('mua')">
+            <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
             <div id="list-buyers"></div>
         </div>
 
         <div id="tab-sellers" class="tab-content">
-            <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm tên, SĐT, loại xe bán..." oninput="renderList('ban')">
+            <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
             <div id="list-sellers"></div>
+        </div>
+
+        <div id="tab-closed" class="tab-content">
+            <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm giao dịch thành công..." oninput="renderList('chot')">
+            <div id="list-closed"></div>
         </div>
 
     </div>
@@ -191,6 +246,9 @@
         </a>
         <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
             <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
+            <span class="nav-icon">🏆</span><span>ĐÃ CHỐT</span>
         </a>
     </div>
 
@@ -219,7 +277,6 @@
             const t = document.getElementById("toast");
             t.innerText = msg;
             t.style.background = isError ? "var(--danger)" : "var(--success)";
-            t.style.color = isError ? "#fff" : "#000";
             t.style.display = "block";
             setTimeout(() => t.style.display = "none", 3000);
         }
@@ -236,7 +293,7 @@
             document.getElementById('field-images').style.display = isMua ? "none" : "block";
         }
 
-        // --- 3. XỬ LÝ ẢNH (KHÁCH BÁN) ---
+        // --- 3. XỬ LÝ ẢNH ---
         function handleImagePreview(input) {
             const grid = document.getElementById('preview-grid');
             grid.innerHTML = "";
@@ -276,7 +333,7 @@
 
             const btn = document.getElementById('btn-save');
             btn.disabled = true;
-            btn.innerText = "⏳ ĐANG XỬ LÝ LƯU...";
+            btn.innerHTML = "⏳ ĐANG XỬ LÝ...";
 
             let imageUrls = [];
             if (type === 'ban') {
@@ -287,6 +344,7 @@
             const customerData = {
                 id: 'cus_' + Date.now(),
                 type: type,
+                status: 'active', // Trạng thái mặc định
                 name: name,
                 phone: phone,
                 car: car,
@@ -296,7 +354,7 @@
                 details: document.getElementById('cus-detail').value,
                 images: imageUrls,
                 created_at: Date.now(),
-                last_checked: Date.now() // Thời gian check lần cuối
+                last_checked: Date.now()
             };
 
             await db.ref('crm_customers/' + customerData.id).set(customerData);
@@ -305,7 +363,7 @@
             setTimeout(() => location.reload(), 1500);
         }
 
-        // --- 5. LẤY & HIỂN THỊ DỮ LIỆU (CÓ THUẬT TOÁN NHẮC NHỞ VIỀN ĐỎ) ---
+        // --- 5. LẤY & HIỂN THỊ DỮ LIỆU THÔNG MINH ---
         db.ref('crm_customers').on('value', (snap) => {
             allCustomers = [];
             if(snap.exists()) {
@@ -313,16 +371,28 @@
             }
             renderList('mua');
             renderList('ban');
+            renderList('chot'); // Render tab đã chốt
         });
 
-        function renderList(type) {
-            const listDiv = document.getElementById(type === 'mua' ? 'list-buyers' : 'list-sellers');
-            const searchKeyword = document.getElementById(type === 'mua' ? 'search-buyer' : 'search-seller').value.toLowerCase();
+        function renderList(tabType) {
+            let listDiv, searchInput;
             
+            if (tabType === 'mua') { listDiv = document.getElementById('list-buyers'); searchInput = document.getElementById('search-buyer'); }
+            else if (tabType === 'ban') { listDiv = document.getElementById('list-sellers'); searchInput = document.getElementById('search-seller'); }
+            else if (tabType === 'chot') { listDiv = document.getElementById('list-closed'); searchInput = document.getElementById('search-closed'); }
+            
+            const searchKeyword = searchInput.value.toLowerCase();
             listDiv.innerHTML = "";
 
-            // Lọc theo Mua/Bán và Từ khóa tìm kiếm
-            let filtered = allCustomers.filter(c => c.type === type);
+            // Lọc dữ liệu: Tab Mua/Bán chỉ hiện khách 'active', Tab Chốt hiện khách 'chot'
+            let filtered = [];
+            if(tabType === 'chot') {
+                filtered = allCustomers.filter(c => c.status === 'chot');
+            } else {
+                filtered = allCustomers.filter(c => c.type === tabType && c.status !== 'chot');
+            }
+
+            // Tìm kiếm
             if(searchKeyword) {
                 filtered = filtered.filter(c => 
                     c.name.toLowerCase().includes(searchKeyword) || 
@@ -331,89 +401,126 @@
                 );
             }
 
-            // --- THUẬT TOÁN SẮP XẾP & CẢNH BÁO ---
+            // --- THUẬT TOÁN THỜI GIAN NHẮC NHỞ ---
             const NOW = Date.now();
-            const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000; // 2 Ngày
+            const DAY_MS = 24 * 60 * 60 * 1000;
             
-            // Hàm đánh giá khách có bị "Bỏ quên" không (Nhãn Nóng + Quá 2 ngày chưa check)
             filtered.forEach(c => {
-                c.isUrgent = (c.tag === 'nong' && (NOW - c.last_checked) > TWO_DAYS_MS);
+                c.isUrgent = false;
+                if(c.status !== 'chot') {
+                    let limitDays = 0;
+                    if(c.tag === 'nong') limitDays = 2;
+                    else if(c.tag === 'am') limitDays = 7;
+                    else if(c.tag === 'nguoi') limitDays = 14;
+                    
+                    c.isUrgent = (NOW - c.last_checked) > (limitDays * DAY_MS);
+                    c.limitDays = limitDays; // Lưu số ngày để hiển thị
+                }
             });
 
-            // Sắp xếp: Khách Urgent lên đầu tiên, sau đó xếp theo thời gian mới nhất
+            // Sắp xếp: Khách Urgent lên đầu -> Mới nhất
             filtered.sort((a, b) => {
                 if(a.isUrgent && !b.isUrgent) return -1;
                 if(!a.isUrgent && b.isUrgent) return 1;
-                return b.created_at - a.created_at;
+                return (b.closed_at || b.created_at) - (a.closed_at || a.created_at);
             });
 
             if(filtered.length === 0) { listDiv.innerHTML = "<p style='text-align:center; color:#666;'>Chưa có dữ liệu.</p>"; return; }
 
             filtered.forEach(cus => {
-                // Render UI Tag
-                let tagUI = "";
-                let tagLabel = "";
-                if(cus.tag === 'nong') { tagUI = "tag-nong"; tagLabel = "🔥 NÓNG"; }
-                if(cus.tag === 'am') { tagUI = "tag-am"; tagLabel = "⚡ ẤM"; }
-                if(cus.tag === 'nguoi') { tagUI = "tag-nguoi"; tagLabel = "❄️ NGUỘI"; }
+                let tagUI = "", tagLabel = "";
+                if(cus.status === 'chot') { tagUI = "tag-chot"; tagLabel = "🏆 THÀNH CÔNG"; }
+                else if(cus.tag === 'nong') { tagUI = "tag-nong"; tagLabel = "🔥 NÓNG"; }
+                else if(cus.tag === 'am') { tagUI = "tag-am"; tagLabel = "⚡ ẤM"; }
+                else if(cus.tag === 'nguoi') { tagUI = "tag-nguoi"; tagLabel = "❄️ NGUỘI"; }
 
-                // Kiểm tra Urgent UI
                 let cardClass = cus.isUrgent ? "card urgent" : "card";
-                let urgentBadge = cus.isUrgent ? `<div class="urgent-badge">🚨 QUÁ 2 NGÀY CHƯA TƯ VẤN</div>` : "";
+                let urgentBadge = cus.isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${cus.limitDays} NGÀY CHƯA TƯ VẤN</div>` : "";
+                
+                // Lọc số điện thoại để link Zalo hoạt động chuẩn
+                let cleanPhone = cus.phone.replace(/\D/g, '');
 
                 let html = `
                     <div class="${cardClass}">
                         ${urgentBadge}
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <h3 style="margin:0; color:var(--primary); font-size:18px;">${cus.name}</h3>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items: center;">
+                            <h3 style="margin:0; color:var(--primary); font-size:17px; font-weight:800;">${cus.name}</h3>
                             <span class="tag ${tagUI}">${tagLabel}</span>
                         </div>
                         <div class="cus-info">
-                            <p>📞 SĐT: <strong><a href="tel:${cus.phone}" style="color:var(--accent); text-decoration:none;">${cus.phone}</a></strong></p>
-                            <p>🚗 Loại xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
-                            <p>💰 Tài chính/Pháp lý: <strong>${cus.finance}</strong></p>
+                            <p>📞 SĐT: 
+                                <strong>
+                                    <a href="tel:${cus.phone}" style="color:var(--accent); text-decoration:none;">${cus.phone}</a>
+                                    <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon" title="Chat Zalo">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
+                                    </a>
+                                </strong>
+                            </p>
+                            <p>🚗 Xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
+                            <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
                             <p>📝 Ghi chú: <strong>${cus.details || 'Không có'}</strong></p>
                         </div>
                 `;
 
-                // Render Ảnh nếu là khách Bán
-                if(cus.type === 'ban' && cus.images && cus.images.length > 0) {
-                    html += `<div class="image-grid" style="margin-top:10px;">`;
+                // Render Ảnh
+                if(cus.images && cus.images.length > 0) {
+                    html += `<div class="image-grid">`;
                     cus.images.forEach(img => { html += `<div class="image-item"><img src="${img}"></div>`; });
                     html += `</div>`;
                 }
 
-                // Cập nhật thời gian check cuối
                 let lastCheckStr = new Date(cus.last_checked).toLocaleString('vi-VN');
 
-                html += `
-                        <div style="margin-top:15px; border-top: 1px dashed var(--border); padding-top:10px;">
-                            <p style="font-size:10px; color:var(--text-dim); margin:0;">Cập nhật lần cuối: ${lastCheckStr}</p>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn btn-check" style="flex:2;" onclick="markChecked('${cus.id}')">
-                                    ✅ ĐÃ LIÊN HỆ / CẬP NHẬT
-                                </button>
-                                <button class="btn btn-outline" style="flex:1; color:var(--danger); border-color:var(--danger);" onclick="deleteCus('${cus.id}')">
-                                    XÓA
-                                </button>
-                            </div>
+                // Hiển thị bộ Nút theo trạng thái
+                if (cus.status === 'chot') {
+                    // Nếu ở tab Đã Chốt
+                    let closedTime = new Date(cus.closed_at).toLocaleString('vi-VN');
+                    html += `
+                        <div style="margin-top:15px; border-top: 1px solid var(--border); padding-top:12px;">
+                            <p style="font-size:11px; color:var(--success); margin:0 0 10px 0; font-weight:bold;">🎉 Chốt ngày: ${closedTime}</p>
+                            <button class="btn btn-danger" onclick="deleteCus('${cus.id}')">🗑️ XÓA DỮ LIỆU NÀY</button>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // Nếu ở tab Mua/Bán (Active)
+                    html += `
+                        <div style="margin-top:15px; border-top: 1px solid var(--border); padding-top:12px;">
+                            <p style="font-size:10px; color:var(--text-dim); margin:0 0 10px 0;">Cập nhật lần cuối: ${lastCheckStr}</p>
+                            
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                                <button class="btn btn-check" onclick="markChecked('${cus.id}')">📞 ĐÃ LIÊN HỆ</button>
+                                <button class="btn btn-danger" onclick="deleteCus('${cus.id}')">🗑️ MẤT KÈO</button>
+                            </div>
+                            <button class="btn btn-success" onclick="markClosed('${cus.id}')">🏆 ĐÃ CHỐT THÀNH CÔNG</button>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
                 listDiv.innerHTML += html;
             });
         }
 
-        // --- 6. HÀM CẬP NHẬT TRẠNG THÁI & XÓA ---
+        // --- 6. CÁC HÀM XỬ LÝ NÚT BẤM ---
         function markChecked(id) {
             db.ref('crm_customers/' + id).update({ last_checked: Date.now() });
-            showToast("Đã lưu lịch sử chăm sóc!");
+            showToast("Đã cập nhật lịch sử chăm sóc!");
+        }
+
+        function markClosed(id) {
+            if(confirm("🎉 Tuyệt vời! Bạn xác nhận đã chốt thành công khách hàng này?")) {
+                db.ref('crm_customers/' + id).update({ 
+                    status: 'chot', 
+                    closed_at: Date.now() 
+                });
+                showToast("🏆 Đã chuyển qua danh sách ĐÃ CHỐT!");
+            }
         }
 
         function deleteCus(id) {
-            if(confirm("Xóa khách hàng này khỏi hệ thống?")) {
+            if(confirm("⚠️ Xác nhận xóa khách hàng này? (Hành động này không thể hoàn tác)")) {
                 db.ref('crm_customers/' + id).remove();
-                showToast("Đã xóa dữ liệu.");
+                showToast("Đã xóa dữ liệu thành công.");
             }
         }
 
