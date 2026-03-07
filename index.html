@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SANG AUTO PRO - MULTI-IMAGE SYSTEM</title>
-    <link rel="apple-touch-icon" href="https://i.ibb.co/XxQKRwz7/image.png">
-
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -62,7 +61,7 @@
             color: #fff; padding: 14px; border-radius: 10px; font-size: 15px; margin-bottom: 15px;
             transition: border 0.3s ease;
         }
-        input:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; }
         
         /* Multi-Image Preview Grid */
         .image-grid {
@@ -105,6 +104,10 @@
         .campaign-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
         
+        /* Acc Badges */
+        .badge-xanh { background: #0052cc; color: white; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 8px; }
+        .badge-trang { background: #e3e3e3; color: black; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 8px; }
+
         /* Toast Notification */
         #toast {
             position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
@@ -127,6 +130,13 @@
         <div id="tab-post" class="tab-content active">
             <h2 class="section-title">Khởi tạo chiến dịch xe</h2>
             <div class="card">
+                
+                <label>Giao việc cho tài khoản nào?</label>
+                <select id="car-account">
+                    <option value="fb_xanh">🔵 Facebook Xanh</option>
+                    <option value="fb_trang">⚪ Facebook Trắng</option>
+                </select>
+
                 <label>Tên định danh xe (VD: Sedona 2021 Trắng)</label>
                 <input type="text" id="car-name" placeholder="Dùng để quản lý nhiều xe">
 
@@ -185,6 +195,7 @@
 
     <script>
         // --- 1. FIREBASE CONFIGURATION ---
+        // (Lưu ý: Đã đổi apikey bằng biến thật của bro)
         const firebaseConfig = {
             apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
             authDomain: "sang-post-auto.firebaseapp.com",
@@ -252,6 +263,7 @@
 
         // --- 4. KÍCH HOẠT CHIẾN DỊCH ---
         async function publishCampaign() {
+            const account = document.getElementById('car-account').value;
             const name = document.getElementById('car-name').value;
             const files = document.getElementById('car-images').files;
             const content = document.getElementById('car-content').value;
@@ -268,6 +280,7 @@
                 const campaignId = "car_" + Date.now();
                 await db.ref('campaigns/' + campaignId).set({
                     id: campaignId,
+                    account: account,  // LƯU TÀI KHOẢN ĐƯỢC PHÂN CÔNG
                     car_name: name,
                     images: imageUrls,
                     content: content,
@@ -292,11 +305,19 @@
 
             snap.forEach(child => {
                 const car = child.val();
+                
+                // Tạo nhãn (badge) màu sắc tùy theo acc
+                let accBadge = "";
+                if(car.account === "fb_xanh") accBadge = `<span class="badge-xanh">FB XANH</span>`;
+                else if(car.account === "fb_trang") accBadge = `<span class="badge-trang">FB TRẮNG</span>`;
+
                 const item = document.createElement('div');
                 item.className = "campaign-item";
                 item.innerHTML = `
                     <div class="campaign-header">
-                        <span style="font-weight:900; font-size:14px;">🚗 ${car.car_name}</span>
+                        <span style="font-weight:900; font-size:14px; display:flex; align-items:center;">
+                            🚗 ${car.car_name} ${accBadge}
+                        </span>
                         <div style="display:flex; align-items:center; gap:5px">
                             <span style="font-size:10px; font-weight:bold; color:#00ff88">ĐANG CHẠY</span>
                             <div class="status-dot"></div>
@@ -340,6 +361,3 @@
     </script>
 </body>
 </html>
-
-
-
