@@ -11,20 +11,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* --- ULTRA PROFESSIONAL DARK THEME --- */
+        /* --- NÂNG CẤP MÀU SẮC: CAO CẤP & NỊNH MẮT HƠN (SLATE DARK THEME) --- */
         :root {
             --primary: #ffffff;
-            --accent: #3b82f6;
-            --accent-gradient: linear-gradient(135deg, #3b82f6, #2563eb);
-            --gold-gradient: linear-gradient(135deg, #f59e0b, #d97706);
-            --green-gradient: linear-gradient(135deg, #10b981, #059669);
-            --bg: #0a0a0a;
-            --card: #151515;
-            --border: #2a2a2a;
-            --text-main: #f3f4f6;
-            --text-dim: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --accent: #38bdf8; /* Xanh ngọc bầu trời - Rất hiện đại */
+            --accent-gradient: linear-gradient(135deg, #38bdf8, #2563eb);
+            --gold-gradient: linear-gradient(135deg, #fbbf24, #d97706);
+            --green-gradient: linear-gradient(135deg, #34d399, #059669);
+            --bg: #0f172a; /* Nền xám xanh sâu (Slate 900) - Chuyên nghiệp hơn đen thui */
+            --card: #1e293b; /* Nền thẻ (Slate 800) */
+            --border: #334155; /* Viền thẻ (Slate 700) */
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --danger: #f43f5e; /* Đỏ Rose - Nổi bật mà không gắt */
+            --warning: #fbbf24;
             --success: #10b981;
         }
 
@@ -35,11 +35,30 @@
             margin: 0; padding-bottom: 90px;
         }
 
+        /* --- MÀN HÌNH BẢO MẬT KHÓA TRUY CẬP --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); backdrop-filter: blur(15px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.4s ease;
+        }
+        .login-box {
+            background: var(--card); padding: 40px 30px; border-radius: 24px;
+            border: 1px solid var(--border); width: 90%; max-width: 360px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: fadeIn 0.5s ease;
+        }
+        .login-box h2 { margin: 0 0 10px 0; color: var(--accent); letter-spacing: 2px; font-weight: 900; }
+        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; }
+        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: rgba(15, 23, 42, 0.8);}
+        
+        #app-content { display: none; } /* Ẩn toàn bộ app khi chưa đăng nhập */
+
         /* Header */
         .header {
-            background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
         .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--text-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
@@ -56,20 +75,20 @@
         .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
         
         .card { 
-            background: linear-gradient(145deg, #181818, #121212); 
+            background: linear-gradient(145deg, #1e293b, #0f172a); 
             border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
         
         label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         input, textarea, select {
-            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
             color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
-            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
         
-        .search-bar { background: #111; border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
+        .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
 
         /* Image Grid */
         .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
@@ -83,41 +102,41 @@
             transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
         }
         .btn:active { transform: scale(0.96); }
-        .btn-main { background: var(--text-main); color: #000; font-size: 14px; padding: 16px;}
+        .btn-main { background: var(--text-main); color: #0f172a; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(255,255,255,0.1);}
         .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
-        .btn-check { background: rgba(59, 130, 246, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+        .btn-check { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
         .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
 
         /* Bottom Navigation */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95);
+            position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #666; font-size: 9px; font-weight: 800; text-decoration: none; transition: 0.3s; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 9px; font-weight: 800; text-decoration: none; transition: 0.3s; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 22px; margin-bottom: 5px; transition: 0.3s;}
         .nav-item.active .nav-icon { transform: translateY(-3px) scale(1.1); }
 
         /* Tags & Badges */
         .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
-        .tag-nong { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.5); }
-        .tag-am { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.5); }
-        .tag-nguoi { background: rgba(59, 130, 246, 0.15); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.5); }
+        .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .tag-nguoi { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
         .tag-chot { background: var(--gold-gradient); color: #fff; border: none; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);}
 
         /* URGENT CUSTOMER ALERT */
         .card.urgent { 
             border: 1px solid var(--danger); 
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); 
-            background: linear-gradient(145deg, #1a1010, #120a0a);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); 
+            background: linear-gradient(145deg, #2a1215, #1e293b); /* Ám đỏ nhẹ rất sang */
         }
         .urgent-badge { 
             position: absolute; top: -12px; right: 15px; 
             background: var(--danger); color: #fff; font-size: 10px; font-weight: 900; 
             padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; 
-            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.5); letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.4); letter-spacing: 0.5px;
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
@@ -129,7 +148,7 @@
             z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); letter-spacing: 0.5px;
         }
         
-        .cus-info { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
+        .cus-info { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
         .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex; align-items: flex-start;}
         .cus-info strong { color: #fff; margin-left: 5px; flex: 1;}
 
@@ -152,107 +171,144 @@
 </head>
 <body>
 
-    <div id="toast">Thành công!</div>
-
-    <div class="header">
-        <h1>SANG AUTO PRO</h1>
-        <span>PREMIUM CRM SYSTEM</span>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>HỆ THỐNG BẢO MẬT</h2>
+            <p>SANG AUTO PRO CRM</p>
+            <input type="password" id="access-key" placeholder="••••••" onkeypress="handleLoginEnter(event)">
+            <button class="btn btn-main" style="margin-top: 10px;" onclick="verifyAccess()">MỞ KHÓA DỮ LIỆU</button>
+        </div>
     </div>
 
-    <div class="container">
-        
-        <div id="tab-input" class="tab-content active">
-            <h2 class="section-title">Phân loại dữ liệu</h2>
-            <div class="card">
-                <label>Bạn đang nhập dữ liệu cho:</label>
-                <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(59, 130, 246, 0.05);">
-                    <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
-                    <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
-                </select>
-            </div>
+    <div id="app-content">
+        <div id="toast">Thành công!</div>
 
-            <h2 class="section-title">Thông tin cơ bản</h2>
-            <div class="card">
-                <label>1. Tên khách hàng</label>
-                <input type="text" id="cus-name" placeholder="VD: Anh Tuấn">
-                
-                <label>2. Số điện thoại</label>
-                <input type="tel" id="cus-phone" placeholder="09xxxxxxxxx">
+        <div class="header">
+            <h1>SANG AUTO PRO</h1>
+            <span>PREMIUM CRM SYSTEM</span>
+        </div>
 
-                <label>3. Loại xe <span id="lbl-xe">khách cần</span></label>
-                <input type="text" id="cus-car" placeholder="VD: Mazda 3, CX5...">
-
-                <label>4. Đời xe, màu xe</label>
-                <input type="text" id="cus-year-color" placeholder="VD: Đời 2020-2022, Màu Đỏ">
-
-                <div id="field-finance-mua">
-                    <label>5. Tài chính (Tiền mặt / Trả góp)</label>
-                    <input type="text" id="cus-finance-mua" placeholder="VD: Có sẵn 300tr vay bank / Tiền mặt 700tr">
-                </div>
-                <div id="field-finance-ban" style="display: none;">
-                    <label>5. Tình trạng tài chính xe</label>
-                    <select id="cus-finance-ban">
-                        <option value="Không vay (Gốc)">Không vay (Gốc, Pháp lý chuẩn)</option>
-                        <option value="Đang vay Ngân hàng">Đang vay Ngân hàng</option>
-                        <option value="Đang cầm cố">Đang cầm cố</option>
+        <div class="container">
+            
+            <div id="tab-input" class="tab-content active">
+                <h2 class="section-title">Phân loại dữ liệu</h2>
+                <div class="card">
+                    <label>Bạn đang nhập dữ liệu cho:</label>
+                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(56, 189, 248, 0.05);">
+                        <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
+                        <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                     </select>
                 </div>
 
-                <label>6. Phân loại khách (Nhãn độ mót)</label>
-                <select id="cus-tag">
-                    <option value="nong">🔥 NÓNG (Nhắc nhở sau 2 ngày)</option>
-                    <option value="am">⚡ ẤM (Nhắc nhở sau 7 ngày)</option>
-                    <option value="nguoi">❄️ NGUỘI (Nhắc nhở sau 14 ngày)</option>
-                </select>
+                <h2 class="section-title">Thông tin cơ bản</h2>
+                <div class="card">
+                    <label>1. Tên khách hàng</label>
+                    <input type="text" id="cus-name" placeholder="VD: Anh Tuấn">
+                    
+                    <label>2. Số điện thoại</label>
+                    <input type="tel" id="cus-phone" placeholder="09xxxxxxxxx">
 
-                <label>7. <span id="lbl-detail">Thông tin chi tiết yêu cầu</span></label>
-                <textarea id="cus-detail" style="height: 100px;" placeholder="Ghi chú thêm về khách..."></textarea>
+                    <label>3. Loại xe <span id="lbl-xe">khách cần</span></label>
+                    <input type="text" id="cus-car" placeholder="VD: Mazda 3, CX5...">
 
-                <div id="field-images" style="display: none;">
-                    <label>8. Hình ảnh xe thực tế (Chọn nhiều ảnh)</label>
-                    <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
-                    <div class="image-grid" id="preview-grid"></div>
+                    <label>4. Đời xe, màu xe</label>
+                    <input type="text" id="cus-year-color" placeholder="VD: Đời 2020-2022, Màu Đỏ">
+
+                    <div id="field-finance-mua">
+                        <label>5. Tài chính (Tiền mặt / Trả góp)</label>
+                        <input type="text" id="cus-finance-mua" placeholder="VD: Có sẵn 300tr vay bank / Tiền mặt 700tr">
+                    </div>
+                    <div id="field-finance-ban" style="display: none;">
+                        <label>5. Tình trạng tài chính xe</label>
+                        <select id="cus-finance-ban">
+                            <option value="Không vay (Gốc)">Không vay (Gốc, Pháp lý chuẩn)</option>
+                            <option value="Đang vay Ngân hàng">Đang vay Ngân hàng</option>
+                            <option value="Đang cầm cố">Đang cầm cố</option>
+                        </select>
+                    </div>
+
+                    <label>6. Phân loại khách (Nhãn độ mót)</label>
+                    <select id="cus-tag">
+                        <option value="nong">🔥 NÓNG (Nhắc nhở sau 2 ngày)</option>
+                        <option value="am">⚡ ẤM (Nhắc nhở sau 7 ngày)</option>
+                        <option value="nguoi">❄️ NGUỘI (Nhắc nhở sau 14 ngày)</option>
+                    </select>
+
+                    <label>7. <span id="lbl-detail">Thông tin chi tiết yêu cầu</span></label>
+                    <textarea id="cus-detail" style="height: 100px;" placeholder="Ghi chú thêm về khách..."></textarea>
+
+                    <div id="field-images" style="display: none;">
+                        <label>8. Hình ảnh xe thực tế (Chọn nhiều ảnh)</label>
+                        <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
+                        <div class="image-grid" id="preview-grid"></div>
+                    </div>
+
+                    <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">
+                        💾 LƯU DỮ LIỆU KHÁCH
+                    </button>
                 </div>
-
-                <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">
-                    💾 LƯU DỮ LIỆU KHÁCH
-                </button>
             </div>
+
+            <div id="tab-buyers" class="tab-content">
+                <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
+                <div id="list-buyers"></div>
+            </div>
+
+            <div id="tab-sellers" class="tab-content">
+                <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
+                <div id="list-sellers"></div>
+            </div>
+
+            <div id="tab-closed" class="tab-content">
+                <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm giao dịch thành công..." oninput="renderList('chot')">
+                <div id="list-closed"></div>
+            </div>
+
         </div>
 
-        <div id="tab-buyers" class="tab-content">
-            <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
-            <div id="list-buyers"></div>
+        <div class="bottom-nav">
+            <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
+                <span class="nav-icon">📝</span><span>NHẬP DATA</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)">
+                <span class="nav-icon">🛒</span><span>KHÁCH MUA</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
+                <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
+                <span class="nav-icon">🏆</span><span>ĐÃ CHỐT</span>
+            </a>
         </div>
+    </div> <script>
+        // --- 0. BẢO MẬT & KIỂM TRA ĐĂNG NHẬP ---
+        function verifyAccess() {
+            const key = document.getElementById('access-key').value;
+            if (key === '190525') {
+                sessionStorage.setItem('crm_unlocked', 'true');
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'block';
+                }, 400); // Hiệu ứng mờ dần cho chuyên nghiệp
+            } else {
+                alert('❌ KHÓA TRUY CẬP KHÔNG ĐÚNG!');
+                document.getElementById('access-key').value = "";
+            }
+        }
 
-        <div id="tab-sellers" class="tab-content">
-            <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
-            <div id="list-sellers"></div>
-        </div>
+        function handleLoginEnter(e) {
+            if (e.key === 'Enter') verifyAccess();
+        }
 
-        <div id="tab-closed" class="tab-content">
-            <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm giao dịch thành công..." oninput="renderList('chot')">
-            <div id="list-closed"></div>
-        </div>
+        // Kiểm tra ngay khi tải trang xem đã đăng nhập trong phiên làm việc chưa
+        document.addEventListener("DOMContentLoaded", () => {
+            if (sessionStorage.getItem('crm_unlocked') === 'true') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+            }
+        });
 
-    </div>
-
-    <div class="bottom-nav">
-        <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
-            <span class="nav-icon">📝</span><span>NHẬP DATA</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)">
-            <span class="nav-icon">🛒</span><span>KHÁCH MUA</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
-            <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
-            <span class="nav-icon">🏆</span><span>ĐÃ CHỐT</span>
-        </a>
-    </div>
-
-    <script>
         // --- 1. FIREBASE & CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
