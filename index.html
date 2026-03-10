@@ -399,7 +399,9 @@
 
         function renderList(type) {
             const listDiv = document.getElementById(type === 'mua' ? 'list-buyers' : (type === 'ban' ? 'list-sellers' : 'list-closed'));
-            const search = document.getElementById(type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : 'search-closed')).value.toLowerCase();
+            const searchInput = document.getElementById(type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : 'search-closed'));
+            if (!searchInput) return;
+            const search = searchInput.value.toLowerCase();
             listDiv.innerHTML = "";
 
             let filtered = allCustomers.filter(c => type === 'chot' ? c.status === 'chot' : (c.type === type && c.status !== 'chot'));
@@ -429,8 +431,7 @@
             });
         }
 
-        // --- 6. LOGIC SĂN TIN (ĐÃ ĐỒNG BỘ) ---
-        // Lấy dữ liệu từ 'hunt_settings'
+        // --- 6. LOGIC SĂN TIN (CẬP NHẬT TÍNH NĂNG XÓA) ---
         db.ref('hunt_settings').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
@@ -451,16 +452,34 @@
             });
         }
 
-        // Hiển thị xe săn được
+        // Xóa một bài viết săn được theo ID
+        function deleteHuntedItem(id) {
+            if(confirm("Xóa tin này khỏi danh sách?")) {
+                db.ref('xe_san_duoc/' + id).remove()
+                .then(() => showToast("Đã xóa tin!"))
+                .catch(() => showToast("Lỗi khi xóa", true));
+            }
+        }
+
+        // Hiển thị xe săn được kèm nút Xóa
         db.ref('xe_san_duoc').limitToLast(20).on('value', snap => {
             const div = document.getElementById('list-hunted'); div.innerHTML = "";
-            let items = []; snap.forEach(c => items.push(c.val()));
+            let items = []; 
+            snap.forEach(child => {
+                let val = child.val();
+                val.fb_id = child.key; // Lưu lại key để xóa
+                items.push(val);
+            });
+            
             items.reverse().forEach(item => {
                 div.innerHTML += `
                     <div class="card" style="border-left:4px solid var(--accent)">
-                        <p style="font-size:14px; font-weight:bold;">${item.ten_xe}</p>
-                        <p style="font-size:11px; color:var(--text-dim)">⏰ ${item.ngay_quet}</p>
-                        <a href="${item.link}" target="_blank" class="btn btn-check" style="margin-top:10px; text-decoration:none;">🌍 XEM BÀI VIẾT</a>
+                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
+                            <p style="font-size:14px; font-weight:bold; margin:0; padding-right:10px;">${item.ten_xe}</p>
+                            <button onclick="deleteHuntedItem('${item.fb_id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer; padding:0;">✕</button>
+                        </div>
+                        <p style="font-size:11px; color:var(--text-dim); margin: 5px 0 10px 0;">⏰ ${item.ngay_quet}</p>
+                        <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT</a>
                     </div>`;
             });
         });
