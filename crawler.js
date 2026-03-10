@@ -5,7 +5,6 @@ const cheerio = require('cheerio');
 async function runBot() {
   console.log("🚀 BẮT ĐẦU ĐI SĂN TIN...");
   
-  // 1. Kết nối Firebase
   const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
   if (!admin.apps.length) {
     admin.initializeApp({
@@ -16,39 +15,44 @@ async function runBot() {
   const db = admin.database();
 
   try {
-    // 2. Cấu hình trang web muốn lấy tin (Ví dụ lấy tin từ một trang mẫu)
-    // Sang có thể thay link này bằng link trang bạn muốn săn
     const targetUrl = 'https://vnexpress.net/phap-luat'; 
     const response = await axios.get(targetUrl);
     const $ = cheerio.load(response.data);
-    let count = 0;
+    
+    const snapshot = await db.ref('posts').once('value');
+    const existingPosts = snapshot.val() || {};
+    const existingLinks = Object.values(existingPosts).map(p => p.link);
 
-    // 3. Tìm các link bài viết (Ví dụ tìm các thẻ h3 chứa link)
+    let count = 0;
     const tasks = [];
+
     $('.title-news a').each((i, el) => {
-      if (i < 5) { // Lấy 5 bài mới nhất thôi cho nhẹ
+      if (count < 5) { 
         const title = $(el).text().trim();
-        const link = $(el).attr('href');
-        
-        if (link) {
-          console.log(`🔍 Tìm thấy: ${title}`);
-          // Lưu vào Firebase
+        let link = $(el).attr('href');
+
+        if (link && !existingLinks.includes(link)) {
+          console.log(`🔍 MỚI: ${title}`);
           tasks.push(db.ref('posts').push({
             title: title,
             link: link,
-            date: new Date().toISOString()
+            date: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
           }));
           count++;
         }
       }
     });
 
-    await Promise.all(tasks);
-    console.log(`✅ ĐÃ SĂN ĐƯỢC ${count} LINK VÀ LƯU VÀO FIREBASE!`);
+    if (tasks.length > 0) {
+      await Promise.all(tasks);
+      console.log(`✅ THÀNH CÔNG: Đã thêm ${count} tin mới!`);
+    } else {
+      console.log("😴 Không có tin nào mới.");
+    }
+    
     process.exit(0);
-
   } catch (err) {
-    console.error("❌ LỖI KHI ĐI SĂN:", err.message);
+    console.error("❌ LỖI:", err.message);
     process.exit(1);
   }
 }
