@@ -13,11 +13,9 @@ function convertToMBasic(url) {
 }
 
 async function runBot() {
-
-  console.log("🚀 BOT SĂN XE FACEBOOK (CRAW VIP)");
+  console.log("🚀 BOT SĂN XE FACEBOOK (CRAW VIP - AUTO COOKIE)");
 
   try {
-
     const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
     if (!admin.apps.length) {
@@ -30,11 +28,13 @@ async function runBot() {
 
     const db = admin.database();
 
+    // 1. ĐỌC TẤT CẢ CONFIG TỪ FIREBASE (BAO GỒM CẢ COOKIE)
     const configSnap = await db.ref("hunt_settings").once("value");
     const config = configSnap.val();
 
-    if (!config || !config.groups || !config.keywords) {
-      console.log("❌ Thiếu config Firebase");
+    // KIỂM TRA THÊM config.cookie
+    if (!config || !config.groups || !config.keywords || !config.cookie) {
+      console.log("❌ Thiếu config hoặc Cookie trên Firebase (Value của ô cookie đang trống)");
       process.exit(0);
     }
 
@@ -48,49 +48,45 @@ async function runBot() {
       .map(k => k.trim().toLowerCase())
       .filter(k => k.length > 0);
 
+    // 2. LẤY COOKIE TỪ FIREBASE THAY VÌ DÁN CỨNG
+    const rawCookie = config.cookie;
+
     console.log("📌 SỐ GROUP:", groups.length);
     console.log("🔑 KEYWORDS:", keywords);
-
-    const rawCookie =
-      "sb=vT6laG97DW9PEmRR6B777vUr; datr=vT6laGhoEHk8DXGhT9syuE6G; fr=1ZyUaHFHU5TY1pATp.AWcAc1E05tRd-VBSekwLeTKGx152_AM1sHcn0O_hFkCDrdL4CxU.Bpr_n-..AAA.0.0.Bpr_of.AWczaDZOLSsZM_L4bQ; c_user=100080351703217; xs=1%3AE7baXfLg5KVXBA%3A2%3A1773140474%3A-1%3A-1%3A%3AAcxTU9UToHGsa-LqTVGccD3UC-PRRzMu01x4bH22gA; wd=982x738";
+    console.log("🍪 TRẠNG THÁI: Đã tải Cookie từ Firebase");
 
     const scanned = new Set();
 
     for (let group of groups) {
-
       let url = convertToMBasic(group);
-
       console.log("🌐 URL FINAL:", url);
 
       let page = 0;
-
       while (url && page < 6) {
-
         console.log("🔎 QUÉT:", url);
 
         const res = await axios.get(url, {
           headers: {
             cookie: rawCookie,
             "user-agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           }
         });
 
         const html = res.data;
 
-        if (html.includes("login") || html.includes("checkpoint")) {
-          console.log("❌ COOKIE HẾT HẠN");
-          process.exit(0);
+        if (html.includes("login") || html.includes("checkpoint") || html.includes("Log In")) {
+          console.log("❌ COOKIE TRÊN FIREBASE HẾT HẠN HOẶC SAI");
+          // Lưu ý: Không process.exit(0) ở đây để nếu group sau là công khai thì vẫn chạy được, 
+          // nhưng ở đây mình giữ nguyên cấu trúc của Sang là thoát luôn để Sang biết mà thay Cookie.
+          process.exit(0); 
         }
 
         const $ = cheerio.load(html);
-
         let found = 0;
 
         $("div[role='article']").each((i, el) => {
-
           const text = $(el).text().toLowerCase();
-
           if (!keywords.some(k => text.includes(k))) return;
 
           let linkRaw =
@@ -104,7 +100,6 @@ async function runBot() {
             : "https://facebook.com" + linkRaw.split("?")[0];
 
           if (scanned.has(fullLink)) return;
-
           scanned.add(fullLink);
 
           console.log("🚗 XE PHÁT HIỆN:", text.substring(0, 80));
@@ -116,16 +111,15 @@ async function runBot() {
               timeZone: "Asia/Ho_Chi_Minh"
             })
           });
-
           found++;
-
         });
 
         console.log("📄 TÌM ĐƯỢC:", found);
 
         let next =
           $("a:contains('See more posts')").attr("href") ||
-          $("a:contains('Xem thêm bài viết')").attr("href");
+          $("a:contains('Xem thêm bài viết')").attr("href") ||
+          $("a:contains('See More Posts')").attr("href");
 
         if (next) {
           url = "https://mbasic.facebook.com" + next;
@@ -134,20 +128,16 @@ async function runBot() {
         }
 
         page++;
-
         await new Promise(r => setTimeout(r, 2500));
       }
     }
 
     console.log("🎉 HOÀN THÀNH QUÉT");
-
     process.exit(0);
 
   } catch (err) {
-
     console.log("❌ LỖI:", err.message);
     process.exit(1);
-
   }
 }
 
