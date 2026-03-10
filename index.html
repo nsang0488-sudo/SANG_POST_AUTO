@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* --- NÂNG CẤP MÀU SẮC: CAO CẤP & NỊNH MẮT HƠN (SLATE DARK THEME) --- */
+        /* Giữ nguyên toàn bộ CSS của Sang và thêm một chút cho ô Cookie */
         :root {
             --primary: #ffffff;
             --accent: #38bdf8;
@@ -35,7 +35,6 @@
             margin: 0; padding-bottom: 90px;
         }
 
-        /* --- MÀN HÌNH BẢO MẬT KHÓA TRUY CẬP --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); backdrop-filter: blur(15px);
@@ -54,7 +53,6 @@
         
         #app-content { display: none; }
 
-        /* Header */
         .header {
             background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
@@ -65,12 +63,10 @@
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        /* Tabs */
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Forms & Inputs */
         .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
         .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
         
@@ -90,12 +86,10 @@
         
         .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
 
-        /* Image Grid */
         .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); position: relative; }
         .image-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Buttons */
         .btn { 
             width: 100%; padding: 14px; border: none; border-radius: 12px; 
             font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
@@ -108,7 +102,6 @@
         .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
         .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
 
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
@@ -119,52 +112,32 @@
         .nav-icon { font-size: 20px; margin-bottom: 5px; transition: 0.3s;}
         .nav-item.active .nav-icon { transform: translateY(-3px) scale(1.1); }
 
-        /* Tags & Badges */
         .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
         .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
         .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); }
         .tag-nguoi { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
-        .tag-chot { background: var(--gold-gradient); color: #fff; border: none; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);}
 
-        /* URGENT CUSTOMER ALERT */
-        .card.urgent { 
-            border: 1px solid var(--danger); 
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); 
-            background: linear-gradient(145deg, #2a1215, #1e293b);
-        }
+        .urgent { border: 1px solid var(--danger); }
         .urgent-badge { 
-            position: absolute; top: -12px; right: 15px; 
-            background: var(--danger); color: #fff; font-size: 10px; font-weight: 900; 
-            padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; 
-            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.4); letter-spacing: 0.5px;
+            position: absolute; top: -12px; right: 15px; background: var(--danger); 
+            color: #fff; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px;
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Toast */
         #toast { 
             position: fixed; top: 90px; left: 50%; transform: translateX(-50%); 
             background: var(--success); color: #fff; padding: 14px 28px; 
             border-radius: 30px; font-weight: 800; font-size: 13px; display: none; 
-            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); letter-spacing: 0.5px;
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         
         .cus-info { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
-        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex; align-items: flex-start;}
+        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex;}
         .cus-info strong { color: #fff; margin-left: 5px; flex: 1;}
 
         .zalo-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            background: #0068ff;
-            border-radius: 5px;
-            margin-left: 8px;
-            vertical-align: middle;
-            transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px;
         }
-        .zalo-icon:active { transform: scale(0.9); }
         .zalo-icon img { width: 14px; height: 14px; }
     </style>
 </head>
@@ -192,7 +165,7 @@
                 <h2 class="section-title">Phân loại dữ liệu</h2>
                 <div class="card">
                     <label>Bạn đang nhập dữ liệu cho:</label>
-                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(56, 189, 248, 0.05);">
+                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">
                         <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
                         <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                     </select>
@@ -241,12 +214,10 @@
                 <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
                 <div id="list-buyers"></div>
             </div>
-
             <div id="tab-sellers" class="tab-content">
                 <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
                 <div id="list-sellers"></div>
             </div>
-
             <div id="tab-closed" class="tab-content">
                 <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm khách đã chốt..." oninput="renderList('chot')">
                 <div id="list-closed"></div>
@@ -257,10 +228,16 @@
                 <div class="card">
                     <label>1. Nguồn Group Facebook (Mỗi link 1 dòng)</label>
                     <textarea id="hunt-links" rows="6" placeholder="https://www.facebook.com/groups/..."></textarea>
+                    
                     <label>2. Từ khóa lọc (Cách nhau bằng dấu phẩy)</label>
                     <input type="text" id="hunt-keywords" placeholder="VD: chính chủ, cần bán, giá rẻ...">
-                    <label>3. Ghi chú cấu hình</label>
+
+                    <label>3. Cookie Facebook (Lấy từ trình duyệt)</label>
+                    <textarea id="hunt-cookie" rows="4" style="font-size: 11px; background: rgba(56, 189, 248, 0.05); border: 1px dashed var(--accent);" placeholder="sb=...; xs=...; c_user=..."></textarea>
+                    
+                    <label>4. Ghi chú cấu hình</label>
                     <input type="text" id="hunt-note" placeholder="Dùng để ghi chú riêng cho Sang">
+                    
                     <button class="btn btn-main" id="btn-save-hunt" onclick="saveHuntSettings()">⚙️ CẬP NHẬT CẤU HÌNH BOT</button>
                 </div>
 
@@ -334,59 +311,24 @@
             document.getElementById('field-images').style.display = isMua ? "none" : "block";
         }
 
-        // --- 3. XỬ LÝ ẢNH ---
-        function handleImagePreview(input) {
-            const grid = document.getElementById('preview-grid'); grid.innerHTML = "";
-            if (input.files) {
-                Array.from(input.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => grid.innerHTML += `<div class="image-item"><img src="${e.target.result}"></div>`;
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
-        async function uploadImages(files) {
-            const urls = [];
-            for (let file of files) {
-                try {
-                    const compressed = await imageCompression(file, { maxSizeMB: 0.6, maxWidthOrHeight: 1024 });
-                    const formData = new FormData(); formData.append("image", compressed);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-                    const resData = await res.json();
-                    if(resData.success) urls.push(resData.data.url);
-                } catch (err) { console.error(err); }
-            }
-            return urls;
-        }
-
         // --- 4. LƯU KHÁCH ---
         async function saveCustomer() {
             const name = document.getElementById('cus-name').value.trim();
             const phone = document.getElementById('cus-phone').value.trim();
             if(!name || !phone) return showToast("Nhập Tên và SĐT!", true);
-            
-            const btn = document.getElementById('btn-save');
-            btn.innerHTML = "⏳ ĐANG LƯU..."; btn.disabled = true;
-
+            const btn = document.getElementById('btn-save'); btn.innerHTML = "⏳ ĐANG LƯU..."; btn.disabled = true;
             let imageUrls = [];
             if (document.getElementById('form-type').value === 'ban') {
                 imageUrls = await uploadImages(document.getElementById('cus-images').files);
             }
-
             const data = {
-                id: 'cus_' + Date.now(),
-                type: document.getElementById('form-type').value,
-                status: 'active',
-                name: name, phone: phone,
-                car: document.getElementById('cus-car').value,
+                id: 'cus_' + Date.now(), type: document.getElementById('form-type').value, status: 'active',
+                name: name, phone: phone, car: document.getElementById('cus-car').value,
                 year_color: document.getElementById('cus-year-color').value,
                 finance: document.getElementById('form-type').value === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
-                tag: document.getElementById('cus-tag').value,
-                details: document.getElementById('cus-detail').value,
-                images: imageUrls,
-                created_at: Date.now(), last_checked: Date.now()
+                tag: document.getElementById('cus-tag').value, details: document.getElementById('cus-detail').value,
+                images: imageUrls, created_at: Date.now(), last_checked: Date.now()
             };
-
             await db.ref('crm_customers/' + data.id).set(data);
             showToast("✅ ĐÃ LƯU!"); location.reload();
         }
@@ -401,12 +343,9 @@
             const listDiv = document.getElementById(type === 'mua' ? 'list-buyers' : (type === 'ban' ? 'list-sellers' : 'list-closed'));
             const searchInput = document.getElementById(type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : 'search-closed'));
             if (!searchInput) return;
-            const search = searchInput.value.toLowerCase();
-            listDiv.innerHTML = "";
-
+            const search = searchInput.value.toLowerCase(); listDiv.innerHTML = "";
             let filtered = allCustomers.filter(c => type === 'chot' ? c.status === 'chot' : (c.type === type && c.status !== 'chot'));
             if(search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || c.phone.includes(search));
-
             filtered.sort((a,b) => b.created_at - a.created_at).forEach(cus => {
                 const isUrgent = (Date.now() - cus.last_checked) > (cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14)) * 86400000;
                 listDiv.innerHTML += `
@@ -419,7 +358,6 @@
                         <div class="cus-info">
                             <p>📞 SĐT: <strong>${cus.phone} <a href="https://zalo.me/${cus.phone.replace(/\D/g,'')}" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></strong></p>
                             <p>🚗 Xe: <strong>${cus.car}</strong></p>
-                            <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
                         </div>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                             ${cus.status !== 'chot' ? `
@@ -431,12 +369,14 @@
             });
         }
 
-        // --- 6. LOGIC SĂN TIN (CẬP NHẬT TÍNH NĂNG XÓA) ---
+        // --- 6. LOGIC SĂN TIN (CẬP NHẬT Ô COOKIE) ---
         db.ref('hunt_settings').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
                 document.getElementById('hunt-links').value = d.groups || "";
                 document.getElementById('hunt-keywords').value = d.keywords || "";
+                document.getElementById('hunt-cookie').value = d.cookie || ""; // Load cookie từ Firebase lên Web
+                document.getElementById('hunt-note').value = d.note || "";
             }
         });
 
@@ -445,38 +385,32 @@
             btn.innerHTML = "⏳ ĐANG LƯU...";
             db.ref('hunt_settings').set({
                 groups: document.getElementById('hunt-links').value.trim(),
-                keywords: document.getElementById('hunt-keywords').value.trim()
+                keywords: document.getElementById('hunt-keywords').value.trim(),
+                cookie: document.getElementById('hunt-cookie').value.trim(), // Lưu cookie mới nhập vào Firebase
+                note: document.getElementById('hunt-note').value.trim()
             }).then(() => {
                 showToast("✅ ĐÃ ĐỒNG BỘ VỚI BOT!");
                 btn.innerHTML = "⚙️ CẬP NHẬT CẤU HÌNH BOT";
             });
         }
 
-        // Xóa một bài viết săn được theo ID
+        // Xóa bài hunted
         function deleteHuntedItem(id) {
             if(confirm("Xóa tin này khỏi danh sách?")) {
-                db.ref('xe_san_duoc/' + id).remove()
-                .then(() => showToast("Đã xóa tin!"))
-                .catch(() => showToast("Lỗi khi xóa", true));
+                db.ref('xe_san_duoc/' + id).remove().then(() => showToast("Đã xóa tin!"));
             }
         }
 
-        // Hiển thị xe săn được kèm nút Xóa
+        // Hiển thị xe hunted
         db.ref('xe_san_duoc').limitToLast(20).on('value', snap => {
             const div = document.getElementById('list-hunted'); div.innerHTML = "";
-            let items = []; 
-            snap.forEach(child => {
-                let val = child.val();
-                val.fb_id = child.key; // Lưu lại key để xóa
-                items.push(val);
-            });
-            
+            let items = []; snap.forEach(child => { let v = child.val(); v.fb_id = child.key; items.push(v); });
             items.reverse().forEach(item => {
                 div.innerHTML += `
                     <div class="card" style="border-left:4px solid var(--accent)">
                         <div style="display:flex; justify-content:space-between; align-items: flex-start;">
                             <p style="font-size:14px; font-weight:bold; margin:0; padding-right:10px;">${item.ten_xe}</p>
-                            <button onclick="deleteHuntedItem('${item.fb_id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer; padding:0;">✕</button>
+                            <button onclick="deleteHuntedItem('${item.fb_id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
                         </div>
                         <p style="font-size:11px; color:var(--text-dim); margin: 5px 0 10px 0;">⏰ ${item.ngay_quet}</p>
                         <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT</a>
