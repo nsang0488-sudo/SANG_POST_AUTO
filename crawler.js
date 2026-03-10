@@ -24,41 +24,43 @@ async function runBot() {
     const keywords = config.keywords.split(",").map(k => k.trim().toLowerCase());
     const rawCookie = config.cookie;
 
-    // 3. MỞ TRÌNH DUYỆT (Chế độ Headless để chạy trên GitHub)
+    // 3. MỞ TRÌNH DUYỆT (Cấu hình chuẩn cho GitHub Actions)
     const browser = await puppeteer.launch({
       headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-notifications"]
+      args: [
+        "--no-sandbox", 
+        "--disable-setuid-sandbox", 
+        "--disable-dev-shm-usage",
+        "--disable-notifications"
+      ]
     });
     const page = await browser.newPage();
 
-    // Set User-Agent để né bot detection
+    // Giả lập User-Agent xịn
     await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
 
-    // Nạp Cookie (Chuyển chuỗi text sang định dạng Puppeteer hiểu)
+    // Nạp Cookie vào trình duyệt
     const cookies = rawCookie.split(';').map(pair => {
       const [name, ...value] = pair.trim().split('=');
-      return { name, value: value.join('='), domain: '.facebook.com' };
-    });
+      if (!name || value.length === 0) return null;
+      return { name, value: value.join('='), domain: '.facebook.com', path: '/' };
+    }).filter(Boolean);
     await page.setCookie(...cookies);
 
     const scanned = new Set();
 
     for (let groupUrl of groups) {
-      console.log(`\n🔎 Đang tiến vào: ${groupUrl}`);
-      
+      console.log(`\n🔎 Đang quét: ${groupUrl}`);
       try {
         await page.goto(groupUrl, { waitUntil: "networkidle2", timeout: 60000 });
 
-        // Cuộn trang 3 lần để ép Facebook load bài mới (Lazy Load)
-        for (let i = 0; i < 3; i++) {
-          await page.evaluate(() => window.scrollBy(0, window.innerHeight));
-          await new Promise(r => setTimeout(r, 2000));
-        }
+        // Cuộn trang để load bài viết (Facebook là trang web động)
+        await page.evaluate(() => window.scrollBy(0, 1000));
+        await new Promise(r => setTimeout(r, 3000));
 
-        // QUÉT BÀI VIẾT TRỰC TIẾP TRÊN DOM
+        // QUÉT DỮ LIỆU
         const posts = await page.evaluate((keywords) => {
           const results = [];
-          // Facebook hiện tại bọc bài viết trong role="article"
           const items = document.querySelectorAll('div[role="article"]');
 
           items.forEach(item => {
@@ -66,10 +68,8 @@ async function runBot() {
             const isMatch = keywords.some(k => text.includes(k));
 
             if (isMatch) {
-              // Tìm link bài viết sạch
               const linkEl = item.querySelector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story.php"]');
               if (linkEl) {
-                // Xử lý lấy link sạch, bỏ các tham số rác đằng sau ?
                 let cleanLink = linkEl.href.split('?')[0];
                 results.push({
                   content: item.innerText.substring(0, 500),
@@ -81,30 +81,27 @@ async function runBot() {
           return results;
         }, keywords);
 
-        console.log(`📊 Tìm thấy ${posts.length} bài có từ khóa.`);
+        console.log(`📊 Tìm thấy ${posts.length} bài phù hợp.`);
 
         for (let post of posts) {
           if (scanned.has(post.link)) continue;
           scanned.add(post.link);
 
-          // PUSH LÊN FIREBASE
           await db.ref("xe_san_duoc").push({
             text: post.content,
             link: post.link,
             time: new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
           });
-          console.log("✅ Đã săn được:", post.link);
+          console.log("✅ Đã lưu bài:", post.link);
         }
-
       } catch (e) {
-        console.log(`⚠️ Group lỗi hoặc timeout: ${e.message}`);
+        console.log(`⚠️ Lỗi quét group: ${e.message}`);
       }
     }
 
     await browser.close();
     console.log("\n🎉 HOÀN THÀNH.");
     process.exit(0);
-
   } catch (err) {
     console.log("❌ LỖI HỆ THỐNG:", err.message);
     process.exit(1);
