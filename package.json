@@ -1,8 +1,7 @@
 {
-  "name": "fb-group-crawler",
+  "name": "bot-san-tin-auto-pro",
   "version": "1.0.0",
-  "description": "Facebook crawler using Puppeteer on GitHub Actions",
-  "main": "index.js",
+  "main": "crawler.js",
   "dependencies": {
     "firebase-admin": "^11.11.1",
     "puppeteer": "^21.5.0"
