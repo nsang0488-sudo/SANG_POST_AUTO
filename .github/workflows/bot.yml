@@ -1,10 +1,9 @@
-name: Bot San Tin Sang Auto Pro
+name: Bot San Tin Sang Auto
 
 on:
   workflow_dispatch:
-
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/10 * * * *"
 
 jobs:
   run-bot:
@@ -16,15 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cài đặt Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "20"
 
-      - name: Cài đặt thư viện
+      - name: Install packages
         run: npm install
 
-      - name: Chạy bot
+      - name: Run bot
         run: node crawler.js
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
