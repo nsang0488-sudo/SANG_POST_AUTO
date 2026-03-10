@@ -1,17 +1,24 @@
 name: Bot San Tin Sang Auto Pro
 
 on:
-  schedule:
-    - cron: '*/30 * * * *' # Cứ mỗi 30 phút GitHub sẽ tự chạy bot 1 lần
-  workflow_dispatch: # Nút bấm để bạn tự chạy tay khi cần thử
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Cài đặt Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - run: npm install
-      - run: node crawler.js
+          
+      - name: Cài thư viện
+        run: npm install firebase-admin
+        
+      - name: Chạy Bot
+        run: node crawler.js
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
