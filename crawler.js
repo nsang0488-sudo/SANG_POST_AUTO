@@ -2,8 +2,8 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 const cheerio = require("cheerio");
 
-// chuyển link group sang mbasic
-function convertToMBasic(url) {
+// chuyển group -> mbasic
+function toMBasic(url) {
   try {
     const u = new URL(url);
     u.hostname = "mbasic.facebook.com";
@@ -16,7 +16,7 @@ function convertToMBasic(url) {
 
 async function runBot() {
 
-  console.log("🚀 BOT SĂN XE SUPER VIP - FIX LINK CHUẨN");
+  console.log("🚀 FACEBOOK GROUP CRAWLER START");
 
   try {
 
@@ -26,19 +26,20 @@ async function runBot() {
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app"
+        databaseURL:
+          "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app"
       });
     }
 
     const db = admin.database();
 
-    // ===== LẤY CONFIG =====
-    const configSnap = await db.ref("hunt_settings").once("value");
-    const config = configSnap.val();
+    // ===== LOAD CONFIG =====
+    const snap = await db.ref("hunt_settings").once("value");
+    const config = snap.val();
 
-    if (!config || !config.groups || !config.keywords || !config.cookie) {
-      console.log("❌ Thiếu config trên Firebase");
-      process.exit(0);
+    if (!config) {
+      console.log("❌ Không có config");
+      return;
     }
 
     const groups = config.groups
@@ -51,69 +52,72 @@ async function runBot() {
       .map(k => k.trim().toLowerCase())
       .filter(Boolean);
 
-    const rawCookie = config.cookie;
+    const cookie = config.cookie;
 
-    console.log(`📌 QUÉT ${groups.length} GROUP`);
-    console.log(`🔑 KEYWORD: ${keywords.join(", ")}`);
+    console.log(`📌 Groups: ${groups.length}`);
+    console.log(`🔑 Keywords: ${keywords.join(", ")}`);
 
     const scanned = new Set();
 
     // ===== QUÉT GROUP =====
     for (let group of groups) {
 
-      let url = convertToMBasic(group);
+      let url = toMBasic(group);
       let page = 0;
 
-      while (url && page < 6) {
+      while (url && page < 5) {
 
-        console.log(`🔎 TRANG ${page + 1}: ${url}`);
+        console.log(`🔎 PAGE ${page + 1}`);
 
-        try {
+        const res = await axios.get(url, {
+          headers: {
+            cookie: cookie,
+            "user-agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+            "accept-language": "vi,en;q=0.9"
+          },
+          timeout: 20000
+        });
 
-          const res = await axios.get(url, {
-            headers: {
-              cookie: rawCookie,
-              "user-agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-            },
-            timeout: 15000
-          });
+        const html = res.data;
 
-          const html = res.data;
+        // check cookie
+        if (
+          html.includes("login") ||
+          html.includes("checkpoint") ||
+          html.includes("Please log in")
+        ) {
+          console.log("❌ COOKIE DIE");
+          return;
+        }
 
-          if (html.includes("login") || html.includes("checkpoint")) {
-            console.log("❌ COOKIE DIE - cập nhật cookie mới");
-            process.exit(0);
-          }
+        const $ = cheerio.load(html);
 
-          const $ = cheerio.load(html);
+        let found = 0;
 
-          let foundCount = 0;
+        // ===== POST BLOCK =====
+        $("div[data-ft]").each((i, el) => {
 
-          // ===== QUÉT TẤT CẢ BLOCK =====
-          $("article, div").each((i, el) => {
+          const text = $(el)
+            .text()
+            .replace(/\s+/g, " ")
+            .toLowerCase();
 
-            const rawText = $(el).text();
+          const match = keywords.some(k => text.includes(k));
 
-            const cleanText = rawText
-              .replace(/\s+/g, " ")
-              .toLowerCase();
+          if (!match) return;
 
-            const isMatch = keywords.some(k =>
-              cleanText.includes(k)
-            );
+          let link = null;
 
-            if (!isMatch) return;
-
-            let link = null;
-
-            // ===== TÌM LINK POST =====
-            $(el).find("a").each((i, a) => {
+          // ===== TÌM LINK POST =====
+          $(el)
+            .find("a")
+            .each((i, a) => {
 
               const href = $(a).attr("href") || "";
 
               if (
-                href.includes("/permalink/") ||
+                href.includes("permalink") ||
                 href.includes("story.php") ||
                 href.includes("/posts/")
               ) {
@@ -123,56 +127,47 @@ async function runBot() {
 
             });
 
-            if (!link) return;
+          if (!link) return;
 
-            let fullLink = link.startsWith("http")
-              ? link
-              : "https://m.facebook.com" + link;
+          let fullLink = link.startsWith("http")
+            ? link
+            : "https://m.facebook.com" + link;
 
-            if (fullLink.includes("story.php")) {
-              fullLink = fullLink.split("&")[0];
-            }
+          if (scanned.has(fullLink)) return;
 
-            if (scanned.has(fullLink)) return;
+          scanned.add(fullLink);
 
-            scanned.add(fullLink);
+          console.log("✅ POST FOUND");
+          console.log(fullLink);
 
-            console.log("✅ PHÁT HIỆN:");
-            console.log(cleanText.substring(0, 80));
-            console.log("🔗", fullLink);
-
-            db.ref("xe_san_duoc").push({
-              ten_xe: rawText.trim().substring(0, 600),
-              link: fullLink,
-              ngay_quet: new Date().toLocaleString("vi-VN", {
-                timeZone: "Asia/Ho_Chi_Minh"
-              })
-            });
-
-            foundCount++;
-
+          db.ref("xe_san_duoc").push({
+            text: text.substring(0, 500),
+            link: fullLink,
+            time: new Date().toLocaleString("vi-VN", {
+              timeZone: "Asia/Ho_Chi_Minh"
+            })
           });
 
-          console.log(`📄 Tìm được ${foundCount} bài`);
+          found++;
 
-          // ===== TÌM TRANG TIẾP =====
-          let nextLink = $("a:contains('Xem thêm'), a:contains('See more')").attr("href");
+        });
 
-          if (nextLink) {
-            url = "https://mbasic.facebook.com" + nextLink;
-            page++;
+        console.log(`📄 Found: ${found}`);
 
-            await new Promise(r => setTimeout(r, 3000));
+        // ===== NEXT PAGE =====
+        const next = $("a:contains('See more'), a:contains('Xem thêm')").attr(
+          "href"
+        );
 
-          } else {
+        if (next) {
 
-            url = null;
+          url = "https://mbasic.facebook.com" + next;
+          page++;
 
-          }
+          await new Promise(r => setTimeout(r, 3000));
 
-        } catch (e) {
+        } else {
 
-          console.log("⚠️ Lỗi truy cập trang");
           url = null;
 
         }
@@ -181,15 +176,11 @@ async function runBot() {
 
     }
 
-    console.log("🎉 HOÀN THÀNH VÒNG QUÉT");
-
-    process.exit(0);
+    console.log("🎉 DONE");
 
   } catch (err) {
 
-    console.log("❌ LỖI HỆ THỐNG:", err.message);
-
-    process.exit(1);
+    console.log("❌ ERROR:", err.message);
 
   }
 
