@@ -1,9 +1,9 @@
 {
-  "name": "sang-auto-bot",
+  "name": "sang-auto-pro-bot",
   "version": "1.0.0",
   "main": "crawler.js",
   "dependencies": {
-    "firebase-admin": "^11.10.0",
-    "puppeteer": "^22.0.0"
+    "firebase-admin": "^11.11.1",
+    "puppeteer": "^21.0.0"
   }
 }
