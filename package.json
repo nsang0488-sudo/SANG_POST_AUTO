@@ -4,9 +4,6 @@
   "main": "crawler.js",
   "dependencies": {
     "firebase-admin": "^11.11.1",
-    "puppeteer": "^21.5.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "puppeteer-core": "^21.5.0"
   }
 }
