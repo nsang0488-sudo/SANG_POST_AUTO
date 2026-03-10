@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '18'
           
-      - name: Cài thư viện
+      - name: Cài đặt thư viện
         run: npm install
         
       - name: Chạy Bot
