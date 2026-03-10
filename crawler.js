@@ -2,6 +2,16 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+function convertToMBasic(url) {
+  try {
+    const u = new URL(url);
+    u.hostname = "mbasic.facebook.com";
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
 async function runBot() {
 
   console.log("🚀 BOT SĂN XE FACEBOOK (CRAW VIP)");
@@ -44,12 +54,13 @@ async function runBot() {
     const rawCookie =
       "sb=vT6laG97DW9PEmRR6B777vUr; datr=vT6laGhoEHk8DXGhT9syuE6G; fr=1ZyUaHFHU5TY1pATp.AWcAc1E05tRd-VBSekwLeTKGx152_AM1sHcn0O_hFkCDrdL4CxU.Bpr_n-..AAA.0.0.Bpr_of.AWczaDZOLSsZM_L4bQ; c_user=100080351703217; xs=1%3AE7baXfLg5KVXBA%3A2%3A1773140474%3A-1%3A-1%3A%3AAcxTU9UToHGsa-LqTVGccD3UC-PRRzMu01x4bH22gA; wd=982x738";
 
-    let scanned = new Set();
+    const scanned = new Set();
 
     for (let group of groups) {
 
-      // ✅ FIX LINK GROUP
-      let url = group.replace("facebook.com", "mbasic.facebook.com");
+      let url = convertToMBasic(group);
+
+      console.log("🌐 URL FINAL:", url);
 
       let page = 0;
 
@@ -80,13 +91,11 @@ async function runBot() {
 
           const text = $(el).text().toLowerCase();
 
-          const match = keywords.some(k => text.includes(k));
+          if (!keywords.some(k => text.includes(k))) return;
 
-          if (!match) return;
-
-          // ✅ FIX LẤY LINK BÀI VIẾT
-          let linkRaw = $(el).find("a[href*='story.php']").attr("href") ||
-                        $(el).find("a").attr("href") || "";
+          let linkRaw =
+            $(el).find("a[href*='story.php']").attr("href") ||
+            $(el).find("a").attr("href");
 
           if (!linkRaw) return;
 
@@ -114,7 +123,6 @@ async function runBot() {
 
         console.log("📄 TÌM ĐƯỢC:", found);
 
-        // ✅ FIX NÚT XEM THÊM
         let next =
           $("a:contains('See more posts')").attr("href") ||
           $("a:contains('Xem thêm bài viết')").attr("href");
