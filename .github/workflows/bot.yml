@@ -3,8 +3,7 @@ name: Bot San Tin Sang Auto Pro
 on:
   workflow_dispatch:
   schedule:
-    # 30 phút một lần từ 22h tối hôm trước đến 16h chiều hôm sau (Giờ UTC)
-    # Tương ứng 5h sáng đến 23h đêm (Giờ Việt Nam)
+    # 30 phút một lần (5h sáng - 23h đêm VN)
     - cron: '0,30 22-23 * * *'
     - cron: '0,30 0-15 * * *'
     - cron: '0 16 * * *'
@@ -20,9 +19,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+          cache: 'npm' # Giúp cài đặt nhanh hơn ở các lần chạy sau
           
       - name: Install packages
         run: npm install
+
+      # Bước này cực kỳ quan trọng để Puppeteer chạy được trên Linux của GitHub
+      - name: Install Google Chrome (Optional but safer)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable libnss3 libatk-bridge2.0-0 libxcomposite1 libxdamage1 libxrandr2 gstreamer1.0-libav libgbm1
         
       - name: Chạy Bot
         run: node crawler.js
