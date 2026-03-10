@@ -3,7 +3,6 @@ name: Bot San Tin Sang Auto Pro
 on:
   workflow_dispatch:
   schedule:
-    # 30 phút một lần từ 5h sáng đến 23h đêm (Giờ Việt Nam)
     - cron: '0,30 22-23 * * *'
     - cron: '0,30 0-15 * * *'
     - cron: '0 16 * * *'
@@ -19,12 +18,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          # Đã xóa dòng cache: npm để tránh lỗi thiếu file lock
           
       - name: Install packages
-        run: npm install
+        run: |
+          export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+          npm install --no-audit --no-fund
         
       - name: Chạy Bot
         run: node crawler.js
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
