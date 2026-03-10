@@ -48,9 +48,8 @@ async function runBot() {
 
     for (let group of groups) {
 
-      let url = group
-        .replace("www.facebook.com", "mbasic.facebook.com")
-        .replace("facebook.com", "mbasic.facebook.com");
+      // ✅ FIX LINK GROUP
+      let url = group.replace("facebook.com", "mbasic.facebook.com");
 
       let page = 0;
 
@@ -85,7 +84,9 @@ async function runBot() {
 
           if (!match) return;
 
-          let linkRaw = $(el).find("a").attr("href") || "";
+          // ✅ FIX LẤY LINK BÀI VIẾT
+          let linkRaw = $(el).find("a[href*='story.php']").attr("href") ||
+                        $(el).find("a").attr("href") || "";
 
           if (!linkRaw) return;
 
@@ -113,6 +114,7 @@ async function runBot() {
 
         console.log("📄 TÌM ĐƯỢC:", found);
 
+        // ✅ FIX NÚT XEM THÊM
         let next =
           $("a:contains('See more posts')").attr("href") ||
           $("a:contains('Xem thêm bài viết')").attr("href");
