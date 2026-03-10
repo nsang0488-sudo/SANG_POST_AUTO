@@ -1,87 +1,108 @@
-const admin = require('firebase-admin');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const admin = require("firebase-admin");
+const puppeteer = require("puppeteer");
 
 async function runBot() {
-  console.log("🚀 BOT SĂN TIN ĐANG CHẠY...");
+
+  console.log("🚀 BOT SĂN TIN FACEBOOK ĐANG CHẠY");
 
   const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
   if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app"
+      databaseURL:
+        "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
     });
   }
 
   const db = admin.database();
 
-  try {
+  // đọc config từ web
+  const configSnap = await db.ref("config/hunt_settings").once("value");
+  const config = configSnap.val();
 
-    const targetUrl = "https://vnexpress.net/oto-xe-may";
-    const response = await axios.get(targetUrl);
+  if (!config) {
+    console.log("❌ Không có config");
+    return;
+  }
 
-    const $ = cheerio.load(response.data);
+  const groups = config.groups.split("\n");
+  const keywords = config.keywords
+    .split(",")
+    .map((k) => k.trim().toLowerCase());
 
-    const snapshot = await db.ref('xe_san_duoc').once('value');
-    const existing = snapshot.val() || {};
+  console.log("GROUP:", groups);
+  console.log("KEYWORD:", keywords);
 
-    const existingLinks = Object.values(existing).map(p => p.link);
+  const browser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox"]
+  });
 
-    let count = 0;
+  const page = await browser.newPage();
 
-    const tasks = [];
+  for (let group of groups) {
 
-    $('.title-news a').each((i, el) => {
+    console.log("🔎 ĐANG QUÉT:", group);
 
-      if (count >= 5) return;
+    await page.goto(group, { waitUntil: "networkidle2" });
 
-      const title = $(el).text().trim();
-      const link = $(el).attr('href');
+    await page.waitForTimeout(6000);
 
-      if (link && !existingLinks.includes(link)) {
+    const posts = await page.evaluate(() => {
 
-        console.log("🔍 TÌM THẤY:", title);
+      const result = [];
 
-        tasks.push(
+      document.querySelectorAll("div[role='article']").forEach((post) => {
 
-          db.ref('xe_san_duoc').push({
-            ten_xe: title,
-            link: link,
-            ngay_quet: new Date().toLocaleString('vi-VN', {
-              timeZone: 'Asia/Ho_Chi_Minh'
-            })
-          })
+        const text = post.innerText;
 
-        );
+        const link = post.querySelector("a[href*='/posts/']");
 
-        count++;
+        if (text && link) {
 
-      }
+          result.push({
+            text: text,
+            link: link.href
+          });
+
+        }
+
+      });
+
+      return result;
 
     });
 
-    if (tasks.length > 0) {
+    console.log("TÌM THẤY:", posts.length);
 
-      await Promise.all(tasks);
+    for (let p of posts) {
 
-      console.log(`✅ ĐÃ THÊM ${count} TIN MỚI`);
+      const content = p.text.toLowerCase();
 
-    } else {
+      const match = keywords.some((k) => content.includes(k));
 
-      console.log("😴 KHÔNG CÓ TIN MỚI");
+      if (match) {
+
+        console.log("✅ TRÙNG KEYWORD");
+
+        await db.ref("xe_san_duoc").push({
+          ten_xe: p.text.substring(0, 150),
+          link: p.link,
+          ngay_quet: new Date().toLocaleString("vi-VN", {
+            timeZone: "Asia/Ho_Chi_Minh"
+          })
+        });
+
+      }
 
     }
 
-    process.exit(0);
-
-  } catch (err) {
-
-    console.error("❌ LỖI:", err.message);
-
-    process.exit(1);
-
   }
+
+  await browser.close();
+
+  console.log("🎉 HOÀN THÀNH");
 
 }
 
