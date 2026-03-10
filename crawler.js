@@ -2,7 +2,7 @@ const admin = require("firebase-admin");
 const puppeteer = require("puppeteer-core");
 
 async function runBot() {
-  console.log("🚀 KHỞI ĐỘNG CRAWLER (SĂN TIN MỚI NHẤT)");
+  console.log("🚀 KHỞI ĐỘNG CRAWLER (BẢN VÉT CẠN - KHÔNG COOKIE)");
 
   try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
@@ -16,14 +16,10 @@ async function runBot() {
 
     const snap = await db.ref("hunt_settings").once("value");
     const config = snap.val();
-    if (!config) return console.log("❌ Lỗi: Không thấy config");
+    if (!config) return console.log("❌ Không thấy config");
 
-    const rawGroups = config.groups || "";
-    const rawKeywords = config.keywords || "";
-    const rawCookie = config.cookie || "";
-
-    const groups = rawGroups.split("\n").map(g => g.trim()).filter(Boolean);
-    const keywords = rawKeywords.split(",").map(k => k.trim().toLowerCase()).filter(Boolean);
+    const groups = (config.groups || "").split("\n").map(g => g.trim()).filter(Boolean);
+    const keywords = (config.keywords || "").split(",").map(k => k.trim().toLowerCase()).filter(Boolean);
 
     const browser = await puppeteer.launch({
       headless: "new",
@@ -32,70 +28,62 @@ async function runBot() {
     });
 
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 1600 });
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-
-    if (rawCookie) {
-      const cookies = rawCookie.split(';').map(pair => {
-        const parts = pair.trim().split('=');
-        return { name: parts[0], value: parts.slice(1).join('='), domain: '.facebook.com', path: '/' };
-      }).filter(c => c.name && c.value);
-      await page.setCookie(...cookies);
-    }
+    // Giả lập iPhone để Facebook trả về giao diện mobile nhẹ hơn, ít bị chặn hơn
+    await page.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1");
 
     for (let groupUrl of groups) {
-      // ÉP FACEBOOK HIỂN THỊ BÀI MỚI NHẤT bằng cách thêm tham số vào URL
-      let huntUrl = groupUrl.includes('?') ? `${groupUrl}&sorting_setting=CHRONOLOGICAL` : `${groupUrl}?sorting_setting=CHRONOLOGICAL`;
+      // Chuyển sang m.facebook để dễ quét hơn khi không có login
+      let mobileUrl = groupUrl.replace("www.facebook.com", "m.facebook.com");
+      console.log(`\n🔎 Đang quét: ${mobileUrl}`);
       
-      console.log(`\n🔎 Đang quét: ${huntUrl}`);
       try {
-        await page.goto(huntUrl, { waitUntil: "networkidle2", timeout: 60000 });
+        await page.goto(mobileUrl, { waitUntil: "networkidle2", timeout: 60000 });
         
-        // Đợi 5 giây để bài viết hiện ra hoàn toàn
+        // Cuộn trang để load bài
+        await page.evaluate(() => window.scrollBy(0, 1500));
         await new Promise(r => setTimeout(r, 5000));
-
-        // Cuộn trang 2 lần để load thêm dữ liệu
-        for(let i=0; i<2; i++){
-          await page.evaluate(() => window.scrollBy(0, 1000));
-          await new Promise(r => setTimeout(r, 2000));
-        }
 
         const posts = await page.evaluate((kws) => {
           const results = [];
-          // Quét tất cả các khối có thể chứa văn bản bài viết
-          const articles = document.querySelectorAll('div[role="article"], div[data-ad-preview="message"], div.x1yzt60o');
+          // Tìm mọi link có cấu trúc bài viết
+          const links = document.querySelectorAll('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story.php"]');
           
-          articles.forEach(art => {
-            const text = art.innerText.toLowerCase();
+          links.forEach(link => {
+            // Tìm khối văn bản lớn nhất chứa cái link này (thường là cả bài viết)
+            let container = link.closest('div') || link.parentElement;
+            for(let i=0; i<5; i++) { 
+                if(container && container.innerText.length < 100) container = container.parentElement;
+            }
+
+            const text = container ? container.innerText.toLowerCase() : "";
             const match = kws.find(k => text.includes(k));
-            
-            if (match) {
-              const linkEl = art.querySelector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="story.php"]');
-              if (linkEl) {
-                results.push({
-                  content: art.innerText.substring(0, 500),
-                  link: linkEl.href.split('?')[0],
-                  keyword: match
-                });
-              }
+
+            if (match && link.href) {
+              results.push({
+                content: text.substring(0, 300),
+                link: link.href.split('?')[0],
+                keyword: match
+              });
             }
           });
           return results;
         }, keywords);
 
-        console.log(`📊 Tìm thấy ${posts.length} bài khớp từ khóa.`);
+        // Lọc trùng link trong 1 lần quét
+        const uniquePosts = Array.from(new Map(posts.map(item => [item.link, item])).values());
         
-        for (let post of posts) {
-          // Lưu vào Firebase
+        console.log(`📊 Tìm thấy ${uniquePosts.length} bài tiềm năng.`);
+        
+        for (let post of uniquePosts) {
           await db.ref("xe_san_duoc").push({
             ...post,
             time: new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
           });
-          console.log(`✅ Lưu bài: ${post.link}`);
+          console.log(`✅ Đã lưu: ${post.link}`);
         }
 
       } catch (e) {
-        console.log(`⚠️ Lỗi tại group: ${e.message}`);
+        console.log(`⚠️ Lỗi: ${e.message}`);
       }
     }
 
