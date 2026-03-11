@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* Giữ nguyên toàn bộ CSS của Sang và thêm một chút cho ô Cookie */
+        /* GIỮ NGUYÊN TOÀN BỘ CSS CŨ CỦA BRO */
         :root {
             --primary: #ffffff;
             --accent: #38bdf8;
@@ -226,19 +226,16 @@
             <div id="tab-hunt" class="tab-content">
                 <h2 class="section-title">Cấu hình Bot săn tin</h2>
                 <div class="card">
-                    <label>1. Nguồn Group Facebook (Mỗi link 1 dòng)</label>
-                    <textarea id="hunt-links" rows="6" placeholder="https://www.facebook.com/groups/..."></textarea>
+                    <label>1. ID Group Facebook (Mỗi ID cách nhau dấu phẩy)</label>
+                    <textarea id="hunt-groups" rows="3" placeholder="VD: 1818063381848053, 123456789..."></textarea>
                     
                     <label>2. Từ khóa lọc (Cách nhau bằng dấu phẩy)</label>
-                    <input type="text" id="hunt-keywords" placeholder="VD: chính chủ, cần bán, giá rẻ...">
+                    <input type="text" id="hunt-keywords" placeholder="VD: xpander, chính chủ, cần bán...">
 
-                    <label>3. Cookie Facebook (Lấy từ trình duyệt)</label>
-                    <textarea id="hunt-cookie" rows="4" style="font-size: 11px; background: rgba(56, 189, 248, 0.05); border: 1px dashed var(--accent);" placeholder="sb=...; xs=...; c_user=..."></textarea>
+                    <label>3. Thời gian nghỉ giữa các lần quét (Phút)</label>
+                    <input type="number" id="hunt-interval" value="10" placeholder="Số phút, ví dụ: 10">
                     
-                    <label>4. Ghi chú cấu hình</label>
-                    <input type="text" id="hunt-note" placeholder="Dùng để ghi chú riêng cho Sang">
-                    
-                    <button class="btn btn-main" id="btn-save-hunt" onclick="saveHuntSettings()">⚙️ CẬP NHẬT CẤU HÌNH BOT</button>
+                    <button class="btn btn-main" id="btn-save-hunt" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH CHO BOT</button>
                 </div>
 
                 <h2 class="section-title">Tin xe mới săn được</h2>
@@ -266,7 +263,7 @@
     </div> 
 
     <script>
-        // --- 0. BẢO MẬT ---
+        // --- 0. BẢO MẬT (Giữ nguyên) ---
         function verifyAccess() {
             if (document.getElementById('access-key').value === '190525') {
                 sessionStorage.setItem('crm_unlocked', 'true');
@@ -291,7 +288,7 @@
         const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
         let allCustomers = [];
 
-        // --- 2. GIAO DIỆN ---
+        // --- 2. GIAO DIỆN (Giữ nguyên) ---
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -311,7 +308,7 @@
             document.getElementById('field-images').style.display = isMua ? "none" : "block";
         }
 
-        // --- 4. LƯU KHÁCH ---
+        // --- 4. LƯU KHÁCH (Giữ nguyên) ---
         async function saveCustomer() {
             const name = document.getElementById('cus-name').value.trim();
             const phone = document.getElementById('cus-phone').value.trim();
@@ -333,7 +330,7 @@
             showToast("✅ ĐÃ LƯU!"); location.reload();
         }
 
-        // --- 5. RENDER DANH SÁCH ---
+        // --- 5. RENDER DANH SÁCH KHÁCH (Giữ nguyên) ---
         db.ref('crm_customers').on('value', snap => {
             allCustomers = []; snap.forEach(c => allCustomers.push(c.val()));
             renderList('mua'); renderList('ban'); renderList('chot');
@@ -369,54 +366,76 @@
             });
         }
 
-        // --- 6. LOGIC SĂN TIN (CẬP NHẬT Ô COOKIE) ---
-        db.ref('hunt_settings').on('value', snap => {
+        // --- 6. LOGIC SĂN TIN MỚI (ĐÃ CẬP NHẬT THEO config_bot) ---
+        
+        // 1. Tự động load cấu hình hiện tại từ Firebase lên các ô nhập
+        db.ref('config_bot').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
-                document.getElementById('hunt-links').value = d.groups || "";
+                document.getElementById('hunt-groups').value = d.groups || "";
                 document.getElementById('hunt-keywords').value = d.keywords || "";
-                document.getElementById('hunt-cookie').value = d.cookie || ""; // Load cookie từ Firebase lên Web
-                document.getElementById('hunt-note').value = d.note || "";
+                document.getElementById('hunt-interval').value = d.interval || 10;
             }
         });
 
-        function saveHuntSettings() {
+        // 2. Hàm lưu cấu hình mới xuống config_bot để Bot ở Laptop nhận lệnh
+        function saveBotSettings() {
             const btn = document.getElementById('btn-save-hunt');
-            btn.innerHTML = "⏳ ĐANG LƯU...";
-            db.ref('hunt_settings').set({
-                groups: document.getElementById('hunt-links').value.trim(),
+            btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
+            db.ref('config_bot').set({
+                groups: document.getElementById('hunt-groups').value.trim(),
                 keywords: document.getElementById('hunt-keywords').value.trim(),
-                cookie: document.getElementById('hunt-cookie').value.trim(), // Lưu cookie mới nhập vào Firebase
-                note: document.getElementById('hunt-note').value.trim()
+                interval: document.getElementById('hunt-interval').value || 10
             }).then(() => {
-                showToast("✅ ĐÃ ĐỒNG BỘ VỚI BOT!");
-                btn.innerHTML = "⚙️ CẬP NHẬT CẤU HÌNH BOT";
+                showToast("✅ ĐÃ GỬI LỆNH CHO BOT!");
+                btn.innerHTML = "⚙️ CẬP NHẬT LỆNH CHO BOT";
             });
         }
 
-        // Xóa bài hunted
+        // 3. Hàm xóa tin đã săn được
         function deleteHuntedItem(id) {
-            if(confirm("Xóa tin này khỏi danh sách?")) {
-                db.ref('xe_san_duoc/' + id).remove().then(() => showToast("Đã xóa tin!"));
+            if(confirm("Xóa tin này?")) {
+                db.ref('san_tin/' + id).remove().then(() => showToast("Đã xóa!"));
             }
         }
 
-        // Hiển thị xe hunted
-        db.ref('xe_san_duoc').limitToLast(20).on('value', snap => {
-            const div = document.getElementById('list-hunted'); div.innerHTML = "";
-            let items = []; snap.forEach(child => { let v = child.val(); v.fb_id = child.key; items.push(v); });
+        // 4. Lắng nghe node 'san_tin' để hiển thị bài mới săn được
+        db.ref('san_tin').limitToLast(20).on('value', snap => {
+            const div = document.getElementById('list-hunted'); 
+            div.innerHTML = "";
+            let items = []; 
+            snap.forEach(child => { 
+                let v = child.val(); 
+                v.id = child.key; 
+                items.push(v); 
+            });
+            
             items.reverse().forEach(item => {
+                const date = item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : 'Vừa xong';
                 div.innerHTML += `
                     <div class="card" style="border-left:4px solid var(--accent)">
                         <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <p style="font-size:14px; font-weight:bold; margin:0; padding-right:10px;">${item.ten_xe}</p>
-                            <button onclick="deleteHuntedItem('${item.fb_id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
+                            <p style="font-size:13px; color: #fff; margin:0; padding-right:10px;">${item.content}</p>
+                            <button onclick="deleteHuntedItem('${item.id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
                         </div>
-                        <p style="font-size:11px; color:var(--text-dim); margin: 5px 0 10px 0;">⏰ ${item.ngay_quet}</p>
-                        <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT</a>
+                        <p style="font-size:10px; color:var(--text-dim); margin: 10px 0;">⏰ ${date}</p>
+                        <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT FACEBOOK</a>
                     </div>`;
             });
         });
+
+        // Helper upload ảnh (Giữ nguyên của bro)
+        async function uploadImages(files) {
+            let urls = [];
+            for (let file of files) {
+                const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1200 });
+                let formData = new FormData(); formData.append("image", compressed);
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+                const json = await res.json();
+                if(json.success) urls.push(json.data.url);
+            }
+            return urls;
+        }
     </script>
 </body>
 </html>
