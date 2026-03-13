@@ -11,20 +11,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* GIỮ NGUYÊN TOÀN BỘ CSS CŨ CỦA BRO */
+        /* ĐÃ NÂNG CẤP BẢNG MÀU SÁNG & ĐA SẮC THEO YÊU CẦU */
         :root {
             --primary: #ffffff;
-            --accent: #38bdf8;
-            --accent-gradient: linear-gradient(135deg, #38bdf8, #2563eb);
-            --gold-gradient: linear-gradient(135deg, #fbbf24, #d97706);
-            --green-gradient: linear-gradient(135deg, #34d399, #059669);
-            --bg: #0f172a;
-            --card: #1e293b;
-            --border: #334155;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --danger: #f43f5e;
-            --warning: #fbbf24;
+            --accent: #4f46e5;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #ec4899); /* Tím sang Hồng */
+            --gold-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
+            --green-gradient: linear-gradient(135deg, #10b981, #059669);
+            --blue-gradient: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            --bg: #f8fafc; /* Nền xám sáng */
+            --card: #ffffff; /* Thẻ trắng tinh */
+            --border: #e2e8f0;
+            --text-main: #1e293b; /* Chữ tối màu */
+            --text-dim: #64748b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
             --success: #10b981;
         }
 
@@ -37,28 +38,28 @@
 
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); backdrop-filter: blur(15px);
+            background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(15px);
             display: flex; align-items: center; justify-content: center;
             z-index: 9999; transition: opacity 0.4s ease;
         }
         .login-box {
             background: var(--card); padding: 40px 30px; border-radius: 24px;
             border: 1px solid var(--border); width: 90%; max-width: 360px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             animation: fadeIn 0.5s ease;
         }
-        .login-box h2 { margin: 0 0 10px 0; color: var(--accent); letter-spacing: 2px; font-weight: 900; }
-        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; }
-        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: rgba(15, 23, 42, 0.8);}
+        .login-box h2 { margin: 0 0 10px 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; font-weight: 900; }
+        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; font-weight: 600; }
+        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: #f1f5f9; color: var(--text-main);}
         
         #app-content { display: none; }
 
         .header {
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
-        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--text-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
@@ -68,26 +69,27 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
-        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent-gradient); border-radius: 4px; }
         
         .card { 
-            background: linear-gradient(145deg, #1e293b, #0f172a); 
+            background: var(--card); 
             border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.03);
         }
         
-        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
+        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
         input, textarea, select {
-            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
-            color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
-            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%; background: #f1f5f9; border: 1px solid var(--border);
+            color: var(--text-main); padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
+            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            font-weight: 500;
         }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); background: #ffffff; }
         
-        .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
+        .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: var(--text-main); box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
 
         .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); position: relative; }
+        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid var(--border); position: relative; }
         .image-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .btn { 
@@ -96,16 +98,16 @@
             transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
         }
         .btn:active { transform: scale(0.96); }
-        .btn-main { background: var(--text-main); color: #0f172a; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(255,255,255,0.1);}
+        .btn-main { background: var(--accent-gradient); color: #fff; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);}
         .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
-        .btn-check { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .btn-check { background: var(--blue-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);}
         .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
-        .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95);
+            position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
         }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8.5px; font-weight: 800; text-decoration: none; transition: 0.3s; }
         .nav-item.active { color: var(--accent); }
@@ -113,32 +115,33 @@
         .nav-item.active .nav-icon { transform: translateY(-3px) scale(1.1); }
 
         .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
-        .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
-        .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); }
-        .tag-nguoi { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .tag-nong { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .tag-am { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .tag-nguoi { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        .urgent { border: 1px solid var(--danger); }
+        .urgent { border: 2px solid var(--danger); }
         .urgent-badge { 
             position: absolute; top: -12px; right: 15px; background: var(--danger); 
             color: #fff; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
         }
 
         #toast { 
             position: fixed; top: 90px; left: 50%; transform: translateX(-50%); 
             background: var(--success); color: #fff; padding: 14px 28px; 
             border-radius: 30px; font-weight: 800; font-size: 13px; display: none; 
-            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
         }
         
-        .cus-info { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
-        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex;}
-        .cus-info strong { color: #fff; margin-left: 5px; flex: 1;}
+        .cus-info { background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border);}
+        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex; align-items: center;}
+        .cus-info strong { color: var(--text-main); margin-left: 5px; flex: 1;}
 
         .zalo-icon {
             display: inline-flex; align-items: center; justify-content: center;
             width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px;
         }
-        .zalo-icon img { width: 14px; height: 14px; }
+        .zalo-icon img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
     </style>
 </head>
 <body>
@@ -165,7 +168,7 @@
                 <h2 class="section-title">Phân loại dữ liệu</h2>
                 <div class="card">
                     <label>Bạn đang nhập dữ liệu cho:</label>
-                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">
+                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(99, 102, 241, 0.05);">
                         <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
                         <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                     </select>
@@ -203,7 +206,7 @@
                     <textarea id="cus-detail" style="height: 100px;" placeholder="Ghi chú thêm..."></textarea>
                     <div id="field-images" style="display: none;">
                         <label>8. Hình ảnh xe thực tế</label>
-                        <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
+                        <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)" style="padding: 10px;">
                         <div class="image-grid" id="preview-grid"></div>
                     </div>
                     <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU DỮ LIỆU KHÁCH</button>
@@ -263,7 +266,7 @@
     </div> 
 
     <script>
-        // --- 0. BẢO MẬT (Giữ nguyên) ---
+        // --- 0. BẢO MẬT ---
         function verifyAccess() {
             if (document.getElementById('access-key').value === '190525') {
                 sessionStorage.setItem('crm_unlocked', 'true');
@@ -288,7 +291,7 @@
         const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
         let allCustomers = [];
 
-        // --- 2. GIAO DIỆN (Giữ nguyên) ---
+        // --- 2. GIAO DIỆN ---
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -308,7 +311,7 @@
             document.getElementById('field-images').style.display = isMua ? "none" : "block";
         }
 
-        // --- 4. LƯU KHÁCH (Giữ nguyên) ---
+        // --- 4. LƯU KHÁCH ---
         async function saveCustomer() {
             const name = document.getElementById('cus-name').value.trim();
             const phone = document.getElementById('cus-phone').value.trim();
@@ -330,7 +333,7 @@
             showToast("✅ ĐÃ LƯU!"); location.reload();
         }
 
-        // --- 5. RENDER DANH SÁCH KHÁCH (Giữ nguyên) ---
+        // --- 5. RENDER DANH SÁCH KHÁCH ---
         db.ref('crm_customers').on('value', snap => {
             allCustomers = []; snap.forEach(c => allCustomers.push(c.val()));
             renderList('mua'); renderList('ban'); renderList('chot');
@@ -349,14 +352,14 @@
                     <div class="card ${isUrgent && cus.status !== 'chot' ? 'urgent' : ''}">
                         ${isUrgent && cus.status !== 'chot' ? '<div class="urgent-badge">🚨 CẦN CHĂM SÓC</div>' : ''}
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <b>${cus.name}</b>
+                            <b style="color: var(--text-main); font-size: 15px;">${cus.name}</b>
                             <span class="tag tag-${cus.tag}">${cus.tag.toUpperCase()}</span>
                         </div>
                         <div class="cus-info">
                             <p>📞 SĐT: <strong>${cus.phone} <a href="https://zalo.me/${cus.phone.replace(/\D/g,'')}" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></strong></p>
                             <p>🚗 Xe: <strong>${cus.car}</strong></p>
                         </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                             ${cus.status !== 'chot' ? `
                                 <button class="btn btn-check" onclick="db.ref('crm_customers/${cus.id}').update({last_checked:Date.now()})">📞 ĐÃ GỌI</button>
                                 <button class="btn btn-success" onclick="db.ref('crm_customers/${cus.id}').update({status:'chot', closed_at:Date.now()})">🏆 CHỐT</button>
@@ -366,9 +369,8 @@
             });
         }
 
-        // --- 6. LOGIC SĂN TIN MỚI (ĐÃ CẬP NHẬT THEO config_bot) ---
+        // --- 6. LOGIC SĂN TIN MỚI ---
         
-        // 1. Tự động load cấu hình hiện tại từ Firebase lên các ô nhập
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
@@ -378,7 +380,6 @@
             }
         });
 
-        // 2. Hàm lưu cấu hình mới xuống config_bot để Bot ở Laptop nhận lệnh
         function saveBotSettings() {
             const btn = document.getElementById('btn-save-hunt');
             btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
@@ -392,14 +393,18 @@
             });
         }
 
-        // 3. Hàm xóa tin đã săn được
+        // Đánh dấu đã đọc
+        function markAsRead(id) {
+            db.ref('san_tin/' + id).update({ isRead: true }).then(() => showToast("Đã đánh dấu đọc!"));
+        }
+
         function deleteHuntedItem(id) {
             if(confirm("Xóa tin này?")) {
                 db.ref('san_tin/' + id).remove().then(() => showToast("Đã xóa!"));
             }
         }
 
-        // 4. Lắng nghe node 'san_tin' để hiển thị bài mới săn được
+        // Hiển thị bài săn được
         db.ref('san_tin').limitToLast(20).on('value', snap => {
             const div = document.getElementById('list-hunted'); 
             div.innerHTML = "";
@@ -412,19 +417,29 @@
             
             items.reverse().forEach(item => {
                 const date = item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : 'Vừa xong';
+                const isRead = item.isRead ? true : false;
+                const borderStyle = isRead ? "border: 2px solid var(--success);" : "border: 2px solid var(--danger);";
+                
                 div.innerHTML += `
-                    <div class="card" style="border-left:4px solid var(--accent)">
-                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <p style="font-size:13px; color: #fff; margin:0; padding-right:10px;">${item.content}</p>
-                            <button onclick="deleteHuntedItem('${item.id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
+                    <div class="card" style="${borderStyle} transition: all 0.3s; padding-bottom: 15px;">
+                        <p style="font-size:14px; color: var(--text-main); font-weight: 500; margin:0 0 5px 0; line-height: 1.5;">${item.content}</p>
+                        <p style="font-size:11px; color:var(--text-dim); margin: 0 0 15px 0;">⏰ ${date}</p>
+                        
+                        <div style="display: flex; gap: 8px;">
+                            <a href="${item.link}" target="_blank" class="btn btn-check" style="flex: 1; text-decoration:none; font-size: 11px; padding: 12px;">🌍 XEM BÀI</a>
+                            
+                            ${!isRead ? 
+                                `<button class="btn btn-success" onclick="markAsRead('${item.id}')" style="flex: 1; font-size: 11px; padding: 12px;">✔️ ĐÃ ĐỌC</button>` : 
+                                `<button class="btn" disabled style="flex: 1; font-size: 11px; padding: 12px; background: rgba(16, 185, 129, 0.1); color: var(--success); cursor: default;">✅ ĐÃ XEM</button>`
+                            }
+                            
+                            <button onclick="deleteHuntedItem('${item.id}')" class="btn btn-danger" style="flex: 1; font-size: 11px; padding: 12px;">🗑️ XÓA</button>
                         </div>
-                        <p style="font-size:10px; color:var(--text-dim); margin: 10px 0;">⏰ ${date}</p>
-                        <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT FACEBOOK</a>
                     </div>`;
             });
         });
 
-        // Helper upload ảnh (Giữ nguyên của bro)
+        // Helper upload ảnh
         async function uploadImages(files) {
             let urls = [];
             for (let file of files) {
