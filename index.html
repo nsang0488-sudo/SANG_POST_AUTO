@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
+        /* --- GIỮ NGUYÊN STYLE CAO CẤP CỦA BẠN --- */
         :root {
             --primary: #ffffff;
             --accent: #38bdf8;
@@ -44,7 +45,10 @@
             background: var(--card); padding: 40px 30px; border-radius: 24px;
             border: 1px solid var(--border); width: 90%; max-width: 360px;
             text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: fadeIn 0.5s ease;
         }
+        .login-box h2 { margin: 0 0 10px 0; color: var(--accent); letter-spacing: 2px; font-weight: 900; }
+        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; }
         .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: rgba(15, 23, 42, 0.8);}
         
         #app-content { display: none; }
@@ -52,46 +56,49 @@
         .header {
             background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
-        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; color: #fff; }
-        .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--text-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; display: flex; align-items: center; gap: 8px;}
-        .section-title::before { content: ""; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+        .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
+        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
         
         .card { 
             background: linear-gradient(145deg, #1e293b, #0f172a); 
             border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
         
-        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
         input, textarea, select {
             width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
             color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
+            transition: all 0.3s;
         }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
         
         .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
 
         .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); }
+        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); position: relative; }
         .image-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .btn { 
             width: 100%; padding: 14px; border: none; border-radius: 12px; 
             font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
         }
-        .btn-main { background: var(--text-main); color: #0f172a; }
+        .btn:active { transform: scale(0.96); }
+        .btn-main { background: var(--text-main); color: #0f172a; font-size: 14px; padding: 16px; }
         .btn-check { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
-        .btn-success { background: var(--green-gradient); color: #fff; }
+        .btn-success { background: var(--green-gradient); color: #fff; border: none; }
         .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
 
         .bottom-nav {
@@ -99,11 +106,11 @@
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
             display: flex; height: 85px; padding-bottom: 20px; z-index: 100;
         }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 9px; text-decoration: none; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 9px; font-weight: 800; text-decoration: none; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 22px; margin-bottom: 5px; }
 
-        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
         .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
         .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
         .tag-nguoi { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
@@ -111,30 +118,31 @@
 
         .card.urgent { border: 1px solid var(--danger); background: linear-gradient(145deg, #2a1215, #1e293b); }
         .urgent-badge { position: absolute; top: -12px; right: 15px; background: var(--danger); color: #fff; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         #toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--success); color: #fff; padding: 14px 28px; border-radius: 30px; font-weight: 800; display: none; z-index: 1000; }
+        
         .cus-info { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
         .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); }
         .cus-info strong { color: #fff; }
-        .zalo-icon { display: inline-flex; width: 20px; height: 20px; background: #0068ff; border-radius: 4px; margin-left: 8px; vertical-align: middle; align-items: center; justify-content: center;}
-        .zalo-icon img { width: 12px; height: 12px; }
+        .zalo-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px; vertical-align: middle;}
+        .zalo-icon img { width: 14px; height: 14px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="color: var(--accent); margin-bottom: 10px;">BẢO MẬT CRM</h2>
-            <p style="color: var(--text-dim); font-size: 12px; margin-bottom: 20px;">SANG AUTO PRO SYSTEM</p>
+            <h2>HỆ THỐNG BẢO MẬT</h2>
+            <p>SANG AUTO PRO CRM</p>
             <input type="password" id="access-key" placeholder="••••••">
-            <button class="btn btn-main" onclick="verifyAccess()">MỞ KHÓA</button>
+            <button class="btn btn-main" style="margin-top: 10px;" onclick="verifyAccess()">MỞ KHÓA DỮ LIỆU</button>
         </div>
     </div>
 
     <div id="app-content">
         <div id="toast">Thành công!</div>
-        <div class="header"><h1>SANG AUTO PRO</h1><span>PREMIUM CRM</span></div>
+        <div class="header"><h1>SANG AUTO PRO</h1><span>PREMIUM CRM SYSTEM</span></div>
 
         <div class="container">
             <div id="tab-input" class="tab-content active">
@@ -145,7 +153,8 @@
                         <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                     </select>
                 </div>
-                <h2 class="section-title">Thông tin chi tiết</h2>
+
+                <h2 class="section-title">Thông tin cơ bản</h2>
                 <div class="card">
                     <label>Tên khách hàng</label>
                     <input type="text" id="cus-name" placeholder="VD: Anh Tuấn">
@@ -155,36 +164,36 @@
                     <input type="text" id="cus-car" placeholder="VD: Mazda 3, CX5...">
                     <label>Đời xe, màu xe</label>
                     <input type="text" id="cus-year-color" placeholder="VD: 2022, Trắng">
-                    
+
                     <div id="field-finance-mua">
                         <label>Tài chính</label>
                         <input type="text" id="cus-finance-mua" placeholder="VD: 500tr mặt">
                     </div>
                     <div id="field-finance-ban" style="display: none;">
-                        <label>Tình trạng pháp lý</label>
+                        <label>Tình trạng tài chính xe</label>
                         <select id="cus-finance-ban">
-                            <option value="Sổ sẵn">Sổ sẵn (Không vay)</option>
-                            <option value="Đang vay Bank">Đang vay Bank</option>
+                            <option value="Không vay">Không vay (Pháp lý chuẩn)</option>
+                            <option value="Đang vay">Đang vay Ngân hàng</option>
                         </select>
                     </div>
 
-                    <label>Phân loại độ mót</label>
+                    <label>Phân loại khách</label>
                     <select id="cus-tag">
                         <option value="nong">🔥 NÓNG (2 ngày)</option>
                         <option value="am">⚡ ẤM (7 ngày)</option>
                         <option value="nguoi">❄️ NGUỘI (14 ngày)</option>
                     </select>
 
-                    <label id="lbl-detail">Ghi chú</label>
-                    <textarea id="cus-detail" style="height: 80px;"></textarea>
+                    <label id="lbl-detail">Ghi chú yêu cầu</label>
+                    <textarea id="cus-detail" style="height: 100px;"></textarea>
 
                     <div id="field-images" style="display: none;">
-                        <label>Hình ảnh xe (Chọn nhiều)</label>
+                        <label>Hình ảnh xe thực tế</label>
                         <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
                         <div class="image-grid" id="preview-grid"></div>
                     </div>
 
-                    <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU DỮ LIỆU</button>
+                    <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU DỮ LIỆU KHÁCH</button>
                 </div>
             </div>
 
@@ -192,16 +201,29 @@
                 <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
                 <div id="list-buyers"></div>
             </div>
+
             <div id="tab-sellers" class="tab-content">
                 <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
                 <div id="list-sellers"></div>
             </div>
+
             <div id="tab-closed" class="tab-content">
                 <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm đã chốt..." oninput="renderList('chot')">
                 <div id="list-closed"></div>
             </div>
+
             <div id="tab-hunt" class="tab-content">
-                <h2 class="section-title">Săn tin tự động</h2>
+                <h2 class="section-title">Cấu hình Bot săn tin</h2>
+                <div class="card">
+                    <label>ID Group Facebook</label>
+                    <textarea id="hunt-groups" rows="3"></textarea>
+                    <label>Từ khóa lọc</label>
+                    <input type="text" id="hunt-keywords">
+                    <label>Thời gian nghỉ (Phút)</label>
+                    <input type="number" id="hunt-interval" value="10">
+                    <button class="btn btn-main" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
+                </div>
+                <h2 class="section-title">Tin mới săn được</h2>
                 <div id="list-hunted"></div>
             </div>
         </div>
@@ -213,10 +235,10 @@
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)"><span class="nav-icon">🏆</span><span>CHỐT</span></a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hunt', this)"><span class="nav-icon">🎯</span><span>SĂN</span></a>
         </div>
-    </div>
+    </div> 
 
     <script>
-        // --- CONFIG & AUTH ---
+        // --- FIREBASE CONFIG (GIỮ NGUYÊN) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
             databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -240,7 +262,6 @@
             }
         });
 
-        // --- CORE LOGIC ---
         let allCustomers = [];
 
         function switchTab(id, el) {
@@ -248,7 +269,6 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
             el.classList.add('active');
-            renderList('mua'); renderList('ban'); renderList('chot');
         }
 
         function toggleFormFields() {
@@ -260,8 +280,7 @@
         }
 
         function handleImagePreview(input) {
-            const grid = document.getElementById('preview-grid');
-            grid.innerHTML = "";
+            const grid = document.getElementById('preview-grid'); grid.innerHTML = "";
             if (input.files) {
                 Array.from(input.files).forEach(file => {
                     const reader = new FileReader();
@@ -273,10 +292,9 @@
 
         async function uploadImages(files) {
             const urls = [];
-            const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1024 };
             for (let file of files) {
                 try {
-                    const compressed = await imageCompression(file, options);
+                    const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1024 });
                     const fd = new FormData(); fd.append("image", compressed);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
                     const data = await res.json();
@@ -286,141 +304,129 @@
             return urls;
         }
 
+        // --- SỬA LỖI LƯU DỮ LIỆU BỊ ĐÈ ---
         async function saveCustomer() {
             const name = document.getElementById('cus-name').value.trim();
             const phone = document.getElementById('cus-phone').value.trim();
-            if(!name || !phone) return alert("Nhập tên và SĐT!");
+            if(!name || !phone) return alert("Nhập Tên và SĐT!");
 
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerHTML = "⏳ ĐANG LƯU...";
 
             const type = document.getElementById('form-type').value;
             let imgs = [];
-            if(type === 'ban') {
-                const files = document.getElementById('cus-images').files;
-                if(files.length > 0) imgs = await uploadImages(files);
-            }
+            if(type === 'ban') imgs = await uploadImages(document.getElementById('cus-images').files);
 
-            // SỬA LỖI TRÙNG ID: Thêm Random để ID luôn độc nhất
-            const uniqueId = 'cus_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            // FIX: Dùng ID kết hợp Random để không bao giờ bị ghi đè
+            const newId = 'cus_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             
             const data = {
-                id: uniqueId,
+                id: newId,
                 type: type,
                 status: 'active',
                 name: name,
                 phone: phone,
-                car: document.getElementById('cus-car').value || '',
-                year_color: document.getElementById('cus-year-color').value || '',
-                finance: type === 'mua' ? (document.getElementById('cus-finance-mua').value || '') : (document.getElementById('cus-finance-ban').value || ''),
+                car: document.getElementById('cus-car').value,
+                year_color: document.getElementById('cus-year-color').value,
+                finance: type === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
                 tag: document.getElementById('cus-tag').value,
-                details: document.getElementById('cus-detail').value || '',
+                details: document.getElementById('cus-detail').value,
                 images: imgs,
                 created_at: Date.now(),
                 last_checked: Date.now()
             };
 
-            await db.ref('crm_customers/' + uniqueId).set(data);
-            alert("Đã lưu thành công!");
-            location.reload();
+            await db.ref('crm_customers/' + newId).set(data);
+            alert("Đã lưu!"); location.reload();
         }
 
-        // --- RENDER LIST ---
+        // --- SỬA LỖI RENDER DANH SÁCH ---
         db.ref('crm_customers').on('value', snap => {
             allCustomers = [];
-            if(snap.exists()){
-                snap.forEach(c => {
-                    let item = c.val();
-                    if(!item.id) item.id = c.key; // Chống lỗi mất ID
-                    allCustomers.push(item);
-                });
-            }
+            snap.forEach(c => {
+                let val = c.val();
+                if(!val.id) val.id = c.key; // Bảo hiểm nếu thiếu ID
+                allCustomers.push(val);
+            });
             renderList('mua'); renderList('ban'); renderList('chot');
         });
 
         function renderList(tab) {
-            const containerMap = { 'mua': 'list-buyers', 'ban': 'list-sellers', 'chot': 'list-closed' };
-            const searchMap = { 'mua': 'search-buyer', 'ban': 'search-seller', 'chot': 'search-closed' };
+            const container = document.getElementById(tab === 'mua' ? 'list-buyers' : (tab === 'ban' ? 'list-sellers' : 'list-closed'));
+            const search = document.getElementById(tab === 'mua' ? 'search-buyer' : (tab === 'ban' ? 'search-seller' : 'search-closed')).value.toLowerCase();
             
-            const container = document.getElementById(containerMap[tab]);
-            if(!container) return;
-            
-            const search = document.getElementById(searchMap[tab]).value.toLowerCase();
-            
-            // Lọc dữ liệu chuẩn theo từng Tab
-            let filtered = allCustomers.filter(c => {
-                const isStatusMatch = (tab === 'chot') ? (c.status === 'chot') : (c.status !== 'chot' && c.type === tab);
-                if(!isStatusMatch) return false;
-                
-                // Tìm kiếm
-                const searchStr = `${c.name} ${c.phone} ${c.car}`.toLowerCase();
-                return searchStr.includes(search);
-            });
+            let filtered = allCustomers.filter(c => tab === 'chot' ? c.status === 'chot' : (c.type === tab && c.status !== 'chot'));
+            if(search) filtered = filtered.filter(c => (c.name+c.phone+c.car).toLowerCase().includes(search));
 
             const now = Date.now();
             let html = "";
-            
             filtered.reverse().forEach(cus => {
-                // Sửa lỗi: Nếu bản ghi lỗi 1 trường, vẫn hiện các bản ghi khác
-                try {
-                    const limit = cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14);
-                    const isUrgent = (tab !== 'chot') && (now - (cus.last_checked || cus.created_at) > limit * 86400000);
-                    const cleanPhone = cus.phone ? String(cus.phone).replace(/\D/g, '') : '';
+                const limit = cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14);
+                const isUrgent = (tab !== 'chot') && (now - (cus.last_checked || cus.created_at) > limit * 86400000);
+                const cleanPhone = cus.phone ? String(cus.phone).replace(/\D/g,'') : '';
 
-                    html += `
-                    <div class="card ${isUrgent ? 'urgent' : ''}">
-                        ${isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${limit} NGÀY</div>` : ''}
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <strong style="font-size:16px;">${cus.name || 'N/A'}</strong>
-                            <span class="tag tag-${cus.tag || 'nguoi'}">${cus.tag === 'nong' ? '🔥 NÓNG' : (cus.tag === 'am' ? '⚡ ẤM' : '❄️ NGUỘI')}</span>
-                        </div>
-                        <div class="cus-info">
-                            <p>📞 SĐT: <strong>${cus.phone || ''}</strong> 
-                               <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a>
-                            </p>
-                            <p>🚗 Xe: <strong>${cus.car || ''}</strong> (${cus.year_color || ''})</p>
-                            <p>💰 Tài chính: <strong>${cus.finance || ''}</strong></p>
-                            <p>📝 Ghi chú: ${cus.details || ''}</p>
-                        </div>`;
-
-                    // HIỂN THỊ ẢNH (Dành cho tab bán hoặc khi có ảnh)
-                    if(cus.images && Array.isArray(cus.images) && cus.images.length > 0) {
-                        html += `<div class="image-grid">`;
-                        cus.images.forEach(img => {
-                            html += `<div class="image-item"><img src="${img}" onclick="window.open('${img}')"></div>`;
-                        });
-                        html += `</div>`;
-                    }
-
-                    html += `
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
-                            ${cus.status !== 'chot' ? `
-                                <button class="btn btn-check" onclick="markChecked('${cus.id}')">📞 ĐÃ LIÊN HỆ</button>
-                                <button class="btn btn-success" onclick="markClosed('${cus.id}')">🏆 CHỐT</button>
-                            ` : ''}
-                            <button class="btn btn-danger" style="grid-column: span ${cus.status === 'chot' ? 2 : 1}" onclick="deleteCus('${cus.id}')">🗑️ XÓA</button>
-                        </div>
+                html += `
+                <div class="card ${isUrgent ? 'urgent' : ''}">
+                    ${isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${limit} NGÀY</div>` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <strong style="font-size:16px;">${cus.name}</strong>
+                        <span class="tag tag-${cus.tag || 'nguoi'}">${cus.tag === 'nong' ? '🔥 NÓNG' : (cus.tag === 'am' ? '⚡ ẤM' : '❄️ NGUỘI')}</span>
+                    </div>
+                    <div class="cus-info">
+                        <p>📞 SĐT: <strong>${cus.phone}</strong> 
+                           <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a>
+                        </p>
+                        <p>🚗 Xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
+                        <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
+                        <p>📝 Ghi chú: ${cus.details}</p>
                     </div>`;
-                } catch (e) { console.error("Lỗi render khách hàng:", e); }
+
+                // FIX: Hiển thị ảnh cho khách bán
+                if(cus.images && Array.isArray(cus.images) && cus.images.length > 0) {
+                    html += `<div class="image-grid">`;
+                    cus.images.forEach(img => html += `<div class="image-item"><img src="${img}" onclick="window.open('${img}')"></div>`);
+                    html += `</div>`;
+                }
+
+                html += `
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
+                        ${cus.status !== 'chot' ? `
+                            <button class="btn btn-check" onclick="markChecked('${cus.id}')">📞 ĐÃ LIÊN HỆ</button>
+                            <button class="btn btn-success" onclick="markClosed('${cus.id}')">🏆 CHỐT</button>
+                        ` : ''}
+                        <button class="btn btn-danger" style="grid-column: span ${cus.status === 'chot' ? 2 : 1}" onclick="deleteCus('${cus.id}')">🗑️ XÓA</button>
+                    </div>
+                </div>`;
             });
-            
-            container.innerHTML = html || "<p style='text-align:center;color:#666;padding:20px;'>Không có dữ liệu trong danh sách này.</p>";
+            container.innerHTML = html || "<p style='text-align:center;color:#666;'>Trống.</p>";
         }
 
-        function markChecked(id) { db.ref('crm_customers/' + id).update({ last_checked: Date.now() }); alert("Đã cập nhật ngày liên hệ!"); }
-        function markClosed(id) { if(confirm("Xác nhận đã chốt thành công?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
-        function deleteCus(id) { if(confirm("Xác nhận xóa vĩnh viễn?")) db.ref('crm_customers/' + id).remove(); }
+        function markChecked(id) { db.ref('crm_customers/' + id).update({ last_checked: Date.now() }); }
+        function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
+        function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
 
-        // --- BOT SĂN TIN ---
+        // --- BOT SĂN TIN (GIỮ NGUYÊN CODE GỐC) ---
+        db.ref('config_bot').on('value', snap => {
+            if(snap.exists()){
+                const d = snap.val();
+                document.getElementById('hunt-groups').value = d.groups || "";
+                document.getElementById('hunt-keywords').value = d.keywords || "";
+                document.getElementById('hunt-interval').value = d.interval || 10;
+            }
+        });
+        function saveBotSettings() {
+            db.ref('config_bot').set({
+                groups: document.getElementById('hunt-groups').value,
+                keywords: document.getElementById('hunt-keywords').value,
+                interval: document.getElementById('hunt-interval').value
+            });
+            alert("Đã cập nhật lệnh Bot!");
+        }
         db.ref('san_tin').limitToLast(15).on('value', snap => {
-            const div = document.getElementById('list-hunted'); 
-            if(!div) return;
-            div.innerHTML = "";
-            let huntList = [];
-            snap.forEach(child => huntList.push(child.val()));
-            huntList.reverse().forEach(item => {
-                div.innerHTML += `
-                <div class="card" style="border-left:4px solid var(--accent)">
+            const div = document.getElementById('list-hunted'); div.innerHTML = "";
+            let items = []; snap.forEach(c => items.push(c.val()));
+            items.reverse().forEach(item => {
+                div.innerHTML += `<div class="card" style="border-left:4px solid var(--accent)">
                     <p style="font-size:13px; margin:0 0 10px 0;">${item.content}</p>
                     <a href="${item.link}" target="_blank" class="btn btn-check">🌍 XEM BÀI VIẾT</a>
                 </div>`;
