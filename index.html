@@ -1,419 +1,355 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANG AUTO PRO - ALL-IN-ONE SYSTEM</title>
-    <link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANG AUTO PRO - PREMIUM CRM</title>
+<link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
-    <style>
-        :root {
-            --primary: #ffffff;
-            --accent: #38bdf8;
-            --accent-gradient: linear-gradient(135deg, #38bdf8, #2563eb);
-            --gold-gradient: linear-gradient(135deg, #fbbf24, #d97706);
-            --green-gradient: linear-gradient(135deg, #34d399, #059669);
-            --bg: #0f172a;
-            --card: #1e293b;
-            --border: #334155;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --danger: #f43f5e;
-            --warning: #fbbf24;
-            --success: #10b981;
-        }
+<style>
+:root{
+--primary:#ffffff;
+--accent:#38bdf8;
+--accent-gradient:linear-gradient(135deg,#38bdf8,#2563eb);
+--gold-gradient:linear-gradient(135deg,#fbbf24,#d97706);
+--green-gradient:linear-gradient(135deg,#34d399,#059669);
+--bg:#0f172a;
+--card:#1e293b;
+--border:#334155;
+--text-main:#f8fafc;
+--text-dim:#94a3b8;
+--danger:#f43f5e;
+--warning:#fbbf24;
+--success:#10b981;
+}
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: var(--bg); color: var(--text-main); 
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0; padding-bottom: 95px;
-        }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:0;padding-bottom:90px}
 
-        /* --- SECURITY SCREEN --- */
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); backdrop-filter: blur(15px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999; transition: opacity 0.4s ease;
-        }
-        .login-box {
-            background: var(--card); padding: 40px 30px; border-radius: 24px;
-            border: 1px solid var(--border); width: 90%; max-width: 360px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        
-        #app-content { display: none; }
+#login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:var(--card);padding:40px;border-radius:24px;border:1px solid var(--border);width:90%;max-width:360px;text-align:center}
+.login-box input{text-align:center;font-size:18px;letter-spacing:5px}
 
-        /* --- LAYOUT --- */
-        .header {
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
-            padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; color: #fff; }
-        .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;}
+#app-content{display:none}
 
-        .container { max-width: 600px; margin: auto; padding: 15px; }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.header{background:rgba(15,23,42,.9);padding:20px;text-align:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header h1{font-size:19px;letter-spacing:5px;font-weight:900;margin:0}
+.header span{color:var(--accent);font-size:10px}
 
-        /* --- UI COMPONENTS --- */
-        .card { 
-            background: linear-gradient(145deg, #1e293b, #0f172a); 
-            border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; display: flex; align-items: center; gap: 8px;}
-        .section-title::before { content: ""; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+.container{max-width:600px;margin:auto;padding:15px}
 
-        input, textarea, select {
-            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
-            color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 15px;
-        }
-        .btn { 
-            width: 100%; padding: 14px; border: none; border-radius: 12px; 
-            font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-        .btn-main { background: var(--text-main); color: #0f172a; }
-        .btn-success { background: var(--green-gradient); color: #fff; }
-        .btn-check { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
-        .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+.tab-content{display:none}
+.tab-content.active{display:block}
 
-        /* --- SCANNER STYLE (FROM ORIGINAL) --- */
-        .post-card { border-left: 4px solid var(--accent); margin-bottom: 15px; }
-        .post-time { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
-        .post-content { font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
-        .highlight { background: rgba(56, 189, 248, 0.2); color: var(--accent); padding: 0 2px; border-radius: 2px; font-weight: bold; }
+.section-title{font-size:12px;font-weight:800;color:var(--text-dim);text-transform:uppercase;margin:25px 0 10px}
 
-        /* --- CRM BADGES --- */
-        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; }
-        .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
-        .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
-        .tag-chot { background: var(--gold-gradient); color: #fff; }
-        .urgent-badge { 
-            position: absolute; top: -12px; right: 15px; background: var(--danger); color: #fff; 
-            font-size: 10px; padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; 
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+.card{background:linear-gradient(145deg,#1e293b,#0f172a);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:15px}
 
-        /* --- BOTTOM NAV --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 85px; padding-bottom: 20px; z-index: 100;
-        }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 9px; font-weight: 800; text-decoration: none; }
-        .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+label{font-size:11px;color:var(--text-dim)}
+input,textarea,select{width:100%;background:#0f172a;border:1px solid var(--border);color:#fff;padding:15px;border-radius:12px;margin-bottom:18px}
 
-        #toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); padding: 14px 28px; border-radius: 30px; font-weight: 800; display: none; z-index: 1000; }
-        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .image-item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
-        .zalo-icon { background: #0068ff; border-radius: 4px; padding: 2px 5px; margin-left: 5px; vertical-align: middle; }
-    </style>
+.search-bar{background:var(--card);border-radius:20px;padding:14px;border:1px solid var(--border);margin-bottom:20px;color:#fff}
+
+.image-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.image-item{aspect-ratio:1/1;border-radius:10px;overflow:hidden}
+.image-item img{width:100%;height:100%;object-fit:cover}
+
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:800;font-size:12px}
+.btn-main{background:var(--text-main);color:#000}
+.btn-success{background:var(--green-gradient);color:#fff}
+.btn-danger{background:rgba(244,63,94,.1);color:var(--danger)}
+.btn-check{background:rgba(56,189,248,.1);color:var(--accent)}
+
+.bottom-nav{position:fixed;bottom:0;width:100%;background:#0f172a;border-top:1px solid var(--border);display:flex;height:85px}
+.nav-item{flex:1;text-align:center;color:var(--text-dim);font-size:9px}
+.nav-item.active{color:var(--accent)}
+
+.tag{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:800}
+.tag-nong{background:rgba(244,63,94,.15);color:var(--danger)}
+.tag-am{background:rgba(251,191,36,.15);color:var(--warning)}
+.tag-nguoi{background:rgba(56,189,248,.15);color:var(--accent)}
+.tag-chot{background:var(--gold-gradient);color:#fff}
+
+.urgent{border:1px solid var(--danger)}
+
+#toast{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:14px 28px;border-radius:30px;display:none}
+</style>
 </head>
+
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2 style="color:var(--accent)">SECURITY</h2>
-            <p style="color:var(--text-dim)">HỆ THỐNG QUẢN TRỊ SANG AUTO PRO</p>
-            <input type="password" id="access-key" placeholder="MẬT MÃ" onkeypress="if(event.key==='Enter') verifyAccess()">
-            <button class="btn btn-main" onclick="verifyAccess()">ĐĂNG NHẬP</button>
-        </div>
-    </div>
+<div id="login-screen">
+<div class="login-box">
+<h2>SANG AUTO PRO</h2>
+<input type="password" id="access-key">
+<button class="btn btn-main" onclick="verifyAccess()">MỞ KHÓA</button>
+</div>
+</div>
 
-    <div id="app-content">
-        <div id="toast"></div>
+<div id="app-content">
 
-        <div class="header">
-            <h1>SANG AUTO PRO</h1>
-            <span id="header-subtitle">PREMIUM CRM & SCANNER</span>
-        </div>
+<div id="toast">OK</div>
 
-        <div class="container">
-            <div id="tab-scan" class="tab-content">
-                <h2 class="section-title">Bộ lọc săn tin auto</h2>
-                <input type="text" id="filter-keywords" placeholder="Từ khóa (VD: i10, brio, giá rẻ...)" oninput="renderPosts()">
-                <div id="post-container">
-                    <p style="text-align:center; color:var(--text-dim)">Đang tải dữ liệu săn tin...</p>
-                </div>
-            </div>
+<div class="header">
+<h1>SANG AUTO PRO</h1>
+<span>PREMIUM CRM</span>
+</div>
 
-            <div id="tab-input" class="tab-content active">
-                <h2 class="section-title">Nhập thông tin khách</h2>
-                <div class="card">
-                    <select id="form-type" onchange="toggleFormFields()">
-                        <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
-                        <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
-                    </select>
-                    <input type="text" id="cus-name" placeholder="Tên khách hàng">
-                    <input type="tel" id="cus-phone" placeholder="Số điện thoại">
-                    <input type="text" id="cus-car" placeholder="Loại xe">
-                    <input type="text" id="cus-year-color" placeholder="Đời xe / Màu xe">
-                    
-                    <div id="field-finance-mua">
-                        <input type="text" id="cus-finance-mua" placeholder="Tài chính / Hình thức mua">
-                    </div>
-                    <div id="field-finance-ban" style="display:none">
-                        <select id="cus-finance-ban">
-                            <option value="Không vay">Pháp lý: Sẵn gốc</option>
-                            <option value="Đang vay">Đang vay ngân hàng</option>
-                        </select>
-                    </div>
+<div class="container">
 
-                    <select id="cus-tag">
-                        <option value="nong">🔥 NÓNG (Cần gọi ngay)</option>
-                        <option value="am">⚡ ẤM (Theo dõi thêm)</option>
-                        <option value="nguoi">❄️ NGUỘI (Lâu dài)</option>
-                    </select>
+<!-- INPUT -->
+<div id="tab-input" class="tab-content active">
 
-                    <textarea id="cus-detail" placeholder="Ghi chú chi tiết..."></textarea>
+<div class="card">
+<label>Phân loại</label>
+<select id="form-type" onchange="toggleFormFields()">
+<option value="mua">KHÁCH MUA</option>
+<option value="ban">KHÁCH BÁN</option>
+</select>
+</div>
 
-                    <div id="field-images" style="display:none">
-                        <input type="file" id="cus-images" multiple accept="image/*" onchange="handleImagePreview(this)">
-                        <div class="image-grid" id="preview-grid"></div>
-                    </div>
+<div class="card">
 
-                    <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU VÀO HỆ THỐNG</button>
-                </div>
-            </div>
+<label>Tên</label>
+<input id="cus-name">
 
-            <div id="tab-buyers" class="tab-content">
-                <input type="text" class="card" style="margin-bottom:10px" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderCRM('mua')">
-                <div id="list-buyers"></div>
-            </div>
+<label>SĐT</label>
+<input id="cus-phone">
 
-            <div id="tab-sellers" class="tab-content">
-                <input type="text" class="card" style="margin-bottom:10px" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderCRM('ban')">
-                <div id="list-sellers"></div>
-            </div>
+<label>Xe</label>
+<input id="cus-car">
 
-            <div id="tab-closed" class="tab-content">
-                <div id="list-closed"></div>
-            </div>
-        </div>
+<label>Đời / màu</label>
+<input id="cus-year-color">
 
-        <div class="bottom-nav">
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('scan', this)">
-                <span class="nav-icon">🎯</span><span>SĂN TIN</span>
-            </a>
-            <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
-                <span class="nav-icon">📝</span><span>NHẬP LIỆU</span>
-            </a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)">
-                <span class="nav-icon">🛒</span><span>KHÁCH MUA</span>
-            </a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
-                <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
-            </a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
-                <span class="nav-icon">🏆</span><span>ĐÃ CHỐT</span>
-            </a>
-        </div>
-    </div>
+<div id="field-finance-mua">
+<label>Tài chính</label>
+<input id="cus-finance-mua">
+</div>
 
-    <script>
-        // --- CONFIG & INIT ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
-            databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "sang-post-auto"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
+<div id="field-finance-ban" style="display:none">
+<label>Tài chính xe</label>
+<select id="cus-finance-ban">
+<option>Không vay</option>
+<option>Vay ngân hàng</option>
+</select>
+</div>
 
-        let allCustomers = [];
-        let allPosts = [];
+<label>Tag</label>
+<select id="cus-tag">
+<option value="nong">NÓNG</option>
+<option value="am">ẤM</option>
+<option value="nguoi">NGUỘI</option>
+</select>
 
-        // --- SECURITY ---
-        function verifyAccess() {
-            if (document.getElementById('access-key').value === '190525') {
-                sessionStorage.setItem('crm_unlocked', 'true');
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-content').style.display = 'block';
-            } else { alert('Sai mật mã!'); }
-        }
-        if (sessionStorage.getItem('crm_unlocked') === 'true') {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
-        }
+<textarea id="cus-detail"></textarea>
 
-        // --- NAVIGATION & UI ---
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            el.classList.add('active');
-        }
+<div id="field-images" style="display:none">
+<input type="file" id="cus-images" multiple onchange="handleImagePreview(this)">
+<div id="preview-grid" class="image-grid"></div>
+</div>
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById("toast");
-            t.innerText = msg;
-            t.style.background = isError ? "var(--danger)" : "var(--success)";
-            t.style.display = "block";
-            setTimeout(() => t.style.display = "none", 3000);
-        }
+<button class="btn btn-main" onclick="saveCustomer()">LƯU</button>
 
-        function toggleFormFields() {
-            const isMua = document.getElementById('form-type').value === 'mua';
-            document.getElementById('field-finance-mua').style.display = isMua ? "block" : "none";
-            document.getElementById('field-finance-ban').style.display = isMua ? "none" : "block";
-            document.getElementById('field-images').style.display = isMua ? "none" : "block";
-        }
+</div>
+</div>
 
-        // --- SĂN TIN LOGIC (KEEP FROM ORIGINAL) ---
-        db.ref('posts').limitToLast(50).on('value', (snapshot) => {
-            allPosts = [];
-            snapshot.forEach(child => { allPosts.push(child.val()); });
-            allPosts.reverse();
-            renderPosts();
-        });
+<div id="tab-buyers" class="tab-content">
+<input class="search-bar" id="search-buyer" oninput="renderList('mua')">
+<div id="list-buyers"></div>
+</div>
 
-        function renderPosts() {
-            const container = document.getElementById('post-container');
-            const keywords = document.getElementById('filter-keywords').value.toLowerCase().split(',').map(k => k.trim()).filter(k => k !== "");
-            container.innerHTML = "";
+<div id="tab-sellers" class="tab-content">
+<input class="search-bar" id="search-seller" oninput="renderList('ban')">
+<div id="list-sellers"></div>
+</div>
 
-            allPosts.forEach(post => {
-                let text = post.content || "";
-                let matches = keywords.length === 0 || keywords.some(k => text.toLowerCase().includes(k));
-                
-                if (matches) {
-                    let displayContent = text;
-                    keywords.forEach(k => {
-                        const regex = new RegExp(`(${k})`, 'gi');
-                        displayContent = displayContent.replace(regex, '<span class="highlight">$1</span>');
-                    });
+<div id="tab-closed" class="tab-content">
+<input class="search-bar" id="search-closed" oninput="renderList('chot')">
+<div id="list-closed"></div>
+</div>
 
-                    container.innerHTML += `
-                        <div class="card post-card">
-                            <div class="post-time">🕒 ${new Date(post.timestamp).toLocaleString('vi-VN')}</div>
-                            <div class="post-content">${displayContent}</div>
-                        </div>
-                    `;
-                }
-            });
-        }
+<!-- BOT -->
+<div id="tab-hunt" class="tab-content">
 
-        // --- CRM LOGIC (RESTORED) ---
-        function handleImagePreview(input) {
-            const grid = document.getElementById('preview-grid');
-            grid.innerHTML = "";
-            if (input.files) {
-                Array.from(input.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => grid.innerHTML += `<div class="image-item"><img src="${e.target.result}"></div>`;
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
+<h2 class="section-title">BOT SĂN TIN</h2>
 
-        async function saveCustomer() {
-            const name = document.getElementById('cus-name').value;
-            if(!name) return showToast("Vui lòng nhập tên khách", true);
-            
-            const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = "ĐANG LƯU...";
+<div class="card">
 
-            let imageUrls = [];
-            const files = document.getElementById('cus-images').files;
-            if(files.length > 0) {
-                const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1024 };
-                for(let f of files) {
-                    const compressed = await imageCompression(f, options);
-                    const fd = new FormData(); fd.append("image", compressed);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {method:"POST", body:fd}).then(r=>r.json());
-                    if(res.success) imageUrls.push(res.data.url);
-                }
-            }
+<label>ID GROUP</label>
+<textarea id="hunt-groups"></textarea>
 
-            const data = {
-                id: 'cus_' + Date.now(),
-                type: document.getElementById('form-type').value,
-                status: 'active',
-                name: name,
-                phone: document.getElementById('cus-phone').value,
-                car: document.getElementById('cus-car').value,
-                year_color: document.getElementById('cus-year-color').value,
-                finance: document.getElementById('form-type').value === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
-                tag: document.getElementById('cus-tag').value,
-                details: document.getElementById('cus-detail').value,
-                images: imageUrls,
-                last_checked: Date.now(),
-                created_at: Date.now()
-            };
+<label>KEYWORD</label>
+<input id="hunt-keywords">
 
-            await db.ref('crm_customers/' + data.id).set(data);
-            showToast("Lưu thành công!");
-            location.reload();
-        }
+<label>INTERVAL</label>
+<input id="hunt-interval" value="10">
 
-        db.ref('crm_customers').on('value', (snap) => {
-            allCustomers = [];
-            if(snap.exists()) snap.forEach(c => allCustomers.push(c.val()));
-            renderCRM('mua'); renderCRM('ban'); renderCRM('chot');
-        });
+<button class="btn btn-main" onclick="saveBotSettings()">LƯU CẤU HÌNH</button>
 
-        function renderCRM(type) {
-            const container = document.getElementById(type === 'mua' ? 'list-buyers' : (type === 'ban' ? 'list-sellers' : 'list-closed'));
-            const search = document.getElementById(type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : ''))?.value.toLowerCase() || "";
-            container.innerHTML = "";
+</div>
 
-            let filtered = allCustomers.filter(c => {
-                if(type === 'chot') return c.status === 'chot';
-                return c.type === type && c.status !== 'chot';
-            });
+<div id="list-hunted"></div>
 
-            if(search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || c.car.toLowerCase().includes(search));
+</div>
 
-            const NOW = Date.now();
-            filtered.forEach(cus => {
-                let limit = cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14);
-                let isUrgent = (NOW - cus.last_checked) > (limit * 24 * 60 * 60 * 1000) && type !== 'chot';
-                
-                let imgHtml = "";
-                if(cus.images) {
-                    imgHtml = `<div class="image-grid">` + cus.images.map(i => `<div class="image-item"><img src="${i}"></div>`).join('') + `</div>`;
-                }
+</div>
 
-                container.innerHTML += `
-                    <div class="card ${isUrgent ? 'urgent' : ''}">
-                        ${isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${limit} NGÀY CHƯA CHĂM</div>` : ''}
-                        <div style="display:flex; justify-content:space-between">
-                            <strong style="font-size:16px">${cus.name}</strong>
-                            <span class="tag tag-${cus.tag}">${cus.tag.toUpperCase()}</span>
-                        </div>
-                        <p style="font-size:13px; margin:10px 0">
-                            📞 <a href="tel:${cus.phone}" style="color:var(--accent)">${cus.phone}</a>
-                            <a href="https://zalo.me/${cus.phone.replace(/\D/g,'')}" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" width="12"></a><br>
-                            🚗 Xe: ${cus.car} (${cus.year_color})<br>
-                            💰 ${cus.finance}
-                        </p>
-                        ${imgHtml}
-                        <div style="margin-top:15px; display:grid; grid-template-columns:1fr 1fr; gap:8px">
-                            ${type !== 'chot' ? `
-                                <button class="btn btn-check" onclick="markChecked('${cus.id}')">ĐÃ GỌI</button>
-                                <button class="btn btn-success" onclick="markClosed('${cus.id}')">CHỐT 🏆</button>
-                            ` : `<button class="btn btn-danger" onclick="deleteCus('${cus.id}')">XÓA</button>`}
-                        </div>
-                    </div>
-                `;
-            });
-        }
+<div class="bottom-nav">
 
-        function markChecked(id) { db.ref('crm_customers/'+id).update({last_checked: Date.now()}); showToast("Đã cập nhật!"); }
-        function markClosed(id) { db.ref('crm_customers/'+id).update({status:'chot', closed_at: Date.now()}); showToast("Chúc mừng chốt thành công!"); }
-        function deleteCus(id) { if(confirm("Xóa vĩnh viễn?")) db.ref('crm_customers/'+id).remove(); }
+<a class="nav-item active" onclick="switchTab('input',this)">INPUT</a>
+<a class="nav-item" onclick="switchTab('buyers',this)">MUA</a>
+<a class="nav-item" onclick="switchTab('sellers',this)">BÁN</a>
+<a class="nav-item" onclick="switchTab('closed',this)">CHỐT</a>
+<a class="nav-item" onclick="switchTab('hunt',this)">BOT</a>
 
-    </script>
+</div>
+</div>
+
+<script>
+
+function verifyAccess(){
+if(document.getElementById("access-key").value==="190525"){
+sessionStorage.setItem("crm_unlocked","true")
+login-screen.style.display="none"
+app-content.style.display="block"
+}
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+if(sessionStorage.getItem("crm_unlocked")){
+login-screen.style.display="none"
+app-content.style.display="block"
+}
+})
+
+const firebaseConfig={
+databaseURL:"https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app"
+}
+
+firebase.initializeApp(firebaseConfig)
+const db=firebase.database()
+
+let allCustomers=[]
+
+function switchTab(id,el){
+document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"))
+document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"))
+document.getElementById("tab-"+id).classList.add("active")
+el.classList.add("active")
+}
+
+function showToast(t){
+const e=document.getElementById("toast")
+e.innerText=t
+e.style.display="block"
+setTimeout(()=>e.style.display="none",3000)
+}
+
+function toggleFormFields(){
+const isMua=document.getElementById("form-type").value==="mua"
+document.getElementById("field-finance-mua").style.display=isMua?"block":"none"
+document.getElementById("field-finance-ban").style.display=isMua?"none":"block"
+document.getElementById("field-images").style.display=isMua?"none":"block"
+}
+
+function handleImagePreview(input){
+const grid=document.getElementById("preview-grid")
+grid.innerHTML=""
+Array.from(input.files).forEach(f=>{
+const r=new FileReader()
+r.onload=e=>grid.innerHTML+=`<div class="image-item"><img src="${e.target.result}"></div>`
+r.readAsDataURL(f)
+})
+}
+
+async function saveCustomer(){
+
+const id="cus_"+Date.now()
+
+const data={
+id:id,
+type:form-type.value,
+status:"active",
+name:cus-name.value,
+phone:cus-phone.value,
+car:cus-car.value,
+year_color:cus-year-color.value,
+finance:form-type.value==="mua"?cus-finance-mua.value:cus-finance-ban.value,
+tag:cus-tag.value,
+details:cus-detail.value,
+created_at:Date.now(),
+last_checked:Date.now()
+}
+
+await db.ref("crm_customers/"+id).set(data)
+
+showToast("ĐÃ LƯU")
+location.reload()
+
+}
+
+db.ref("crm_customers").on("value",snap=>{
+allCustomers=[]
+snap.forEach(c=>allCustomers.push(c.val()))
+renderList("mua")
+renderList("ban")
+renderList("chot")
+})
+
+function renderList(type){
+
+let list=document.getElementById(type==="mua"?"list-buyers":type==="ban"?"list-sellers":"list-closed")
+
+list.innerHTML=""
+
+let filtered=allCustomers.filter(c=>type==="chot"?c.status==="chot":c.type===type&&c.status!=="chot")
+
+filtered.forEach(c=>{
+
+list.innerHTML+=`
+<div class="card">
+<b>${c.name}</b>
+<p>${c.phone}</p>
+<p>${c.car}</p>
+
+<button class="btn btn-check" onclick="db.ref('crm_customers/${c.id}').update({last_checked:Date.now()})">ĐÃ GỌI</button>
+<button class="btn btn-success" onclick="db.ref('crm_customers/${c.id}').update({status:'chot',closed_at:Date.now()})">CHỐT</button>
+
+</div>
+`
+
+})
+
+}
+
+function saveBotSettings(){
+db.ref("config_bot").set({
+groups:document.getElementById("hunt-groups").value,
+keywords:document.getElementById("hunt-keywords").value,
+interval:document.getElementById("hunt-interval").value
+}).then(()=>showToast("ĐÃ GỬI BOT"))
+}
+
+db.ref("san_tin").limitToLast(20).on("value",snap=>{
+const div=document.getElementById("list-hunted")
+div.innerHTML=""
+snap.forEach(c=>{
+let v=c.val()
+div.innerHTML+=`
+<div class="card">
+<p>${v.content}</p>
+<a href="${v.link}" target="_blank" class="btn btn-check">XEM BÀI</a>
+</div>
+`
+})
+})
+
+</script>
+
 </body>
 </html>
