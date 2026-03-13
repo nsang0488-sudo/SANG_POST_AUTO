@@ -228,8 +228,29 @@
             <div id="tab-news" class="tab-content">
                 <div class="radar-box">
                     <div class="radar-circle"></div>
-                    <p style="font-size: 11px; color: var(--accent); margin-top: 15px; font-weight: 800; letter-spacing: 2px;">BOT ĐANG QUÉT TIN MỚI...</p>
+                    <p style="font-size: 11px; color: var(--accent); margin-top: 15px; font-weight: 800; letter-spacing: 2px;">BOT ĐANG QUÉT TIN THEO CẤU HÌNH...</p>
                 </div>
+
+                <div class="card" style="border: 1px dashed var(--accent);">
+                    <h2 class="section-title" style="margin-top:0">Cấu hình Radar</h2>
+                    
+                    <label>ID Nhóm / Group Facebook (Cần quét)</label>
+                    <input type="text" id="radar-groups" placeholder="VD: 1234567, 8901234...">
+
+                    <label>Từ khóa cần săn (Keywords - cách nhau bằng dấu phẩy)</label>
+                    <input type="text" id="radar-keywords" placeholder="VD: cần mua, tìm xe, tài chính...">
+
+                    <label>Tần suất quét tin</label>
+                    <select id="radar-interval">
+                        <option value="5">5 phút / lần</option>
+                        <option value="15" selected>15 phút / lần</option>
+                        <option value="30">30 phút / lần</option>
+                        <option value="60">1 tiếng / lần</option>
+                    </select>
+
+                    <button class="btn btn-check" onclick="updateRadarConfig()">📡 CẬP NHẬT CẤU HÌNH</button>
+                </div>
+
                 <div id="list-news"></div>
             </div>
 
@@ -279,6 +300,7 @@
                 setTimeout(() => {
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
+                    loadRadarSettings(); // Tải cấu hình radar khi vào app
                 }, 400);
             } else {
                 alert('❌ KHÓA TRUY CẬP KHÔNG ĐÚNG!');
@@ -289,6 +311,7 @@
             if (sessionStorage.getItem('crm_unlocked') === 'true') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-content').style.display = 'block';
+                loadRadarSettings();
             }
         });
 
@@ -387,12 +410,34 @@
             setTimeout(() => location.reload(), 1500);
         }
 
-        // --- 5. BỘ SĂN TIN (RADAR) ---
+        // --- 5. BỘ SĂN TIN (RADAR) + CONFIG ---
+        function updateRadarConfig() {
+            const config = {
+                groups: document.getElementById('radar-groups').value,
+                keywords: document.getElementById('radar-keywords').value,
+                interval: document.getElementById('radar-interval').value,
+                updated_at: Date.now()
+            };
+            db.ref('radar_settings').set(config).then(() => {
+                showToast("🚀 CẬP NHẬT CẤU HÌNH THÀNH CÔNG!");
+            });
+        }
+
+        function loadRadarSettings() {
+            db.ref('radar_settings').once('value', (snap) => {
+                if(snap.exists()){
+                    const d = snap.val();
+                    document.getElementById('radar-groups').value = d.groups || '';
+                    document.getElementById('radar-keywords').value = d.keywords || '';
+                    document.getElementById('radar-interval').value = d.interval || '15';
+                }
+            });
+        }
+
         function loadNews() {
             const listNews = document.getElementById('list-news');
             listNews.innerHTML = "<p style='text-align:center; color:#666;'>Đang tải tin mới...</p>";
 
-            // Lấy từ node leads (giả định bot của ông đẩy vào đây)
             db.ref('crm_leads').limitToLast(20).on('value', (snap) => {
                 listNews.innerHTML = "";
                 if(!snap.exists()) {
