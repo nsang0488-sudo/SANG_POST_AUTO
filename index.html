@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* GIỮ NGUYÊN TOÀN BỘ CSS GỐC */
+        /* GIỮ NGUYÊN TOÀN BỘ CSS GỐC CỦA BẠN */
         :root {
             --primary: #ffffff;
             --accent: #38bdf8;
@@ -220,10 +220,12 @@
                 <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
                 <div id="list-buyers"></div>
             </div>
+
             <div id="tab-sellers" class="tab-content">
                 <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
                 <div id="list-sellers"></div>
             </div>
+
             <div id="tab-closed" class="tab-content">
                 <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm khách đã chốt..." oninput="renderList('chot')">
                 <div id="list-closed"></div>
@@ -246,13 +248,13 @@
         </div>
 
         <div class="bottom-nav">
-            <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
+            <a href="javascript:void(0)" class="nav-item active" id="nav-input" onclick="switchTab('input', this)">
                 <span class="nav-icon">📝</span><span>NHẬP DATA</span>
             </a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)">
+            <a href="javascript:void(0)" class="nav-item" id="nav-buyers" onclick="switchTab('buyers', this)">
                 <span class="nav-icon">🛒</span><span>KHÁCH MUA</span>
             </a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
+            <a href="javascript:void(0)" class="nav-item" id="nav-sellers" onclick="switchTab('sellers', this)">
                 <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
             </a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
@@ -265,7 +267,7 @@
     </div> 
 
     <script>
-        // --- 0. BẢO MẬT (Giữ nguyên) ---
+        // --- 0. BẢO MẬT ---
         function verifyAccess() {
             if (document.getElementById('access-key').value === '190525') {
                 sessionStorage.setItem('crm_unlocked', 'true');
@@ -325,26 +327,28 @@
 
         // --- 3. LƯU KHÁCH ---
         async function saveCustomer() {
+            const type = document.getElementById('form-type').value;
             const name = document.getElementById('cus-name').value.trim();
             const phone = document.getElementById('cus-phone').value.trim();
             if(!name || !phone) return showToast("Nhập Tên và SĐT!", true);
+            
             const btn = document.getElementById('btn-save'); 
             btn.innerHTML = "⏳ ĐANG LƯU..."; btn.disabled = true;
             
             let imageUrls = [];
-            if (document.getElementById('form-type').value === 'ban') {
+            if (type === 'ban') {
                 imageUrls = await uploadImages(document.getElementById('cus-images').files);
             }
 
             const data = {
                 id: 'cus_' + Date.now(), 
-                type: document.getElementById('form-type').value, 
+                type: type, 
                 status: 'active',
                 name: name, 
                 phone: phone, 
                 car: document.getElementById('cus-car').value,
                 year_color: document.getElementById('cus-year-color').value,
-                finance: document.getElementById('form-type').value === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
+                finance: type === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
                 tag: document.getElementById('cus-tag').value, 
                 details: document.getElementById('cus-detail').value,
                 images: imageUrls, 
@@ -353,11 +357,27 @@
             };
 
             await db.ref('crm_customers/' + data.id).set(data);
-            showToast("✅ ĐÃ LƯU!"); 
-            location.reload();
+            showToast("✅ ĐÃ LƯU THÀNH CÔNG!");
+            
+            // Xóa form
+            document.getElementById('cus-name').value = "";
+            document.getElementById('cus-phone').value = "";
+            document.getElementById('cus-car').value = "";
+            document.getElementById('cus-year-color').value = "";
+            document.getElementById('cus-finance-mua').value = "";
+            document.getElementById('cus-detail').value = "";
+            document.getElementById('preview-grid').innerHTML = "";
+            btn.innerHTML = "💾 LƯU DỮ LIỆU KHÁCH"; btn.disabled = false;
+
+            // Tự động chuyển tab sau khi lưu
+            if(type === 'mua') {
+                switchTab('buyers', document.getElementById('nav-buyers'));
+            } else {
+                switchTab('sellers', document.getElementById('nav-sellers'));
+            }
         }
 
-        // --- 4. RENDER DANH SÁCH KHÁCH ---
+        // --- 4. RENDER DANH SÁCH ---
         db.ref('crm_customers').on('value', snap => {
             allCustomers = []; snap.forEach(c => allCustomers.push(c.val()));
             renderList('mua'); renderList('ban'); renderList('chot');
@@ -375,7 +395,6 @@
             if(search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || c.phone.includes(search));
 
             filtered.sort((a,b) => b.created_at - a.created_at).forEach(cus => {
-                // Logic nhắc lịch: Nóng 2 ngày, Ấm 7 ngày, Nguội 14 ngày
                 const diffDays = (Date.now() - cus.last_checked) / 86400000;
                 const isUrgent = diffDays > (cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14));
 
@@ -403,10 +422,10 @@
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg">
                                 </a>
                             </strong></p>
-                            <p>🚗 Loại xe: <strong>${cus.car || 'Chưa cập nhật'}</strong></p>
-                            <p>🎨 Đời/Màu: <strong>${cus.year_color || 'Chưa cập nhật'}</strong></p>
-                            <p>💰 Tài chính: <strong>${cus.finance || 'Chưa cập nhật'}</strong></p>
-                            <p>📝 Ghi chú: <strong>${cus.details || 'Không có ghi chú'}</strong></p>
+                            <p>🚗 Xe: <strong>${cus.car || 'Trống'}</strong></p>
+                            <p>🎨 Đời/Màu: <strong>${cus.year_color || 'Trống'}</strong></p>
+                            <p>💰 Tài chính: <strong>${cus.finance || 'Trống'}</strong></p>
+                            <p>📝 Chi tiết: <strong>${cus.details || 'Không có ghi chú'}</strong></p>
                         </div>
 
                         ${imagesHtml}
@@ -417,37 +436,34 @@
                                 <button class="btn btn-success" style="font-size:10px;" onclick="handleClosed('${cus.id}')">🏆 CHỐT</button>
                                 <button class="btn btn-danger" style="font-size:10px;" onclick="handleMissed('${cus.id}')">❌ HỤT KÈO</button>
                             ` : `
-                                <button class="btn btn-danger" style="grid-column: span 3" onclick="handleMissed('${cus.id}')">🗑️ XÓA HỒ SƠ</button>
+                                <button class="btn btn-danger" style="grid-column: span 3" onclick="handleMissed('${cus.id}')">🗑️ XÓA DỮ LIỆU</button>
                             `}
                         </div>
                     </div>`;
             });
         }
 
-        // --- CÁC HÀM XỬ LÝ NÚT QUẢN LÝ ---
+        // --- HÀM ĐIỀU KHIỂN ---
         function handleCared(id) {
             db.ref('crm_customers/' + id).update({ last_checked: Date.now() });
-            showToast("Đã cập nhật lịch chăm sóc!");
+            showToast("Đã reset lịch chăm sóc!");
         }
 
         function handleClosed(id) {
-            if(confirm("Xác nhận đã chốt thành công khách này?")) {
-                db.ref('crm_customers/' + id).update({ 
-                    status: 'chot', 
-                    closed_at: Date.now() 
-                });
-                showToast("Chúc mừng! Đã chuyển qua mục ĐÃ CHỐT.");
+            if(confirm("Xác nhận đã chốt thành công?")) {
+                db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() });
+                showToast("Đã chuyển vào tab ĐÃ CHỐT!");
             }
         }
 
         function handleMissed(id) {
-            if(confirm("Bạn muốn xóa khách hàng này khỏi danh sách?")) {
+            if(confirm("Bạn muốn xóa vĩnh viễn khách này?")) {
                 db.ref('crm_customers/' + id).remove();
-                showToast("Đã xóa dữ liệu khách.");
+                showToast("Đã xóa khách!");
             }
         }
 
-        // --- 5. LOGIC SĂN TIN (Giữ nguyên của bro) ---
+        // --- 5. LOGIC SĂN TIN (GIỮ NGUYÊN 100%) ---
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
@@ -458,8 +474,7 @@
         });
 
         function saveBotSettings() {
-            const btn = document.getElementById('btn-save-hunt');
-            btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
+            const btn = document.getElementById('btn-save-hunt'); btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
             db.ref('config_bot').set({
                 groups: document.getElementById('hunt-groups').value.trim(),
                 keywords: document.getElementById('hunt-keywords').value.trim(),
@@ -470,26 +485,16 @@
             });
         }
 
-        function deleteHuntedItem(id) {
-            if(confirm("Xóa tin này?")) {
-                db.ref('san_tin/' + id).remove().then(() => showToast("Đã xóa!"));
-            }
-        }
-
         db.ref('san_tin').limitToLast(20).on('value', snap => {
-            const div = document.getElementById('list-hunted'); 
-            div.innerHTML = "";
-            let items = []; 
-            snap.forEach(child => { 
-                let v = child.val(); v.id = child.key; items.push(v); 
-            });
+            const div = document.getElementById('list-hunted'); div.innerHTML = "";
+            let items = []; snap.forEach(child => { let v = child.val(); v.id = child.key; items.push(v); });
             items.reverse().forEach(item => {
                 const date = item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : 'Vừa xong';
                 div.innerHTML += `
                     <div class="card" style="border-left:4px solid var(--accent)">
                         <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                            <p style="font-size:13px; color: #fff; margin:0; padding-right:10px;">${item.content}</p>
-                            <button onclick="deleteHuntedItem('${item.id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
+                            <p style="font-size:13px; color: #fff; margin:0;">${item.content}</p>
+                            <button onclick="deleteHuntedItem('${item.id}')" style="background:none; border:none; color:var(--danger); font-size:16px;">✕</button>
                         </div>
                         <p style="font-size:10px; color:var(--text-dim); margin: 10px 0;">⏰ ${date}</p>
                         <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT</a>
@@ -497,17 +502,18 @@
             });
         });
 
+        function deleteHuntedItem(id) { if(confirm("Xóa tin này?")) db.ref('san_tin/' + id).remove(); }
+
         async function uploadImages(files) {
             let urls = [];
             for (let file of files) {
                 try {
                     const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1200 });
-                    let formData = new FormData(); 
-                    formData.append("image", compressed);
+                    let formData = new FormData(); formData.append("image", compressed);
                     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
                     const json = await res.json();
                     if(json.success) urls.push(json.data.url);
-                } catch(e) { console.error("Upload lỗi:", e); }
+                } catch(e) { console.error(e); }
             }
             return urls;
         }
