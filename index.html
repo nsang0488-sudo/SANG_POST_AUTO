@@ -449,13 +449,14 @@
         function renderList(tabType) {
             let listDiv, searchInput;
             
+            // Xử lý đúng thẻ tab và input tìm kiếm
             if (tabType === 'mua') { listDiv = document.getElementById('list-buyers'); searchInput = document.getElementById('search-buyer'); }
             else if (tabType === 'ban') { listDiv = document.getElementById('list-sellers'); searchInput = document.getElementById('search-seller'); }
             else if (tabType === 'chot') { listDiv = document.getElementById('list-closed'); searchInput = document.getElementById('search-closed'); }
             
             const searchKeyword = searchInput.value.toLowerCase();
-            listDiv.innerHTML = "";
-
+            
+            // Lọc danh sách riêng biệt
             let filtered = [];
             if(tabType === 'chot') {
                 filtered = allCustomers.filter(c => c.status === 'chot');
@@ -463,11 +464,12 @@
                 filtered = allCustomers.filter(c => c.type === tabType && c.status !== 'chot');
             }
 
+            // Xử lý an toàn khi tìm kiếm, ngăn chặn lỗi JS dừng vòng lặp
             if(searchKeyword) {
                 filtered = filtered.filter(c => 
-                    c.name.toLowerCase().includes(searchKeyword) || 
-                    c.phone.includes(searchKeyword) || 
-                    c.car.toLowerCase().includes(searchKeyword)
+                    (c.name && c.name.toLowerCase().includes(searchKeyword)) || 
+                    (c.phone && String(c.phone).includes(searchKeyword)) || 
+                    (c.car && c.car.toLowerCase().includes(searchKeyword))
                 );
             }
 
@@ -482,7 +484,7 @@
                     else if(c.tag === 'am') limitDays = 7;
                     else if(c.tag === 'nguoi') limitDays = 14;
                     
-                    c.isUrgent = (NOW - c.last_checked) > (limitDays * DAY_MS);
+                    c.isUrgent = (NOW - (c.last_checked || c.created_at || NOW)) > (limitDays * DAY_MS);
                     c.limitDays = limitDays;
                 }
             });
@@ -490,10 +492,15 @@
             filtered.sort((a, b) => {
                 if(a.isUrgent && !b.isUrgent) return -1;
                 if(!a.isUrgent && b.isUrgent) return 1;
-                return (b.closed_at || b.created_at) - (a.closed_at || a.created_at);
+                return (b.closed_at || b.created_at || 0) - (a.closed_at || a.created_at || 0);
             });
 
-            if(filtered.length === 0) { listDiv.innerHTML = "<p style='text-align:center; color:#666;'>Chưa có dữ liệu.</p>"; return; }
+            if(filtered.length === 0) { 
+                listDiv.innerHTML = "<p style='text-align:center; color:#666;'>Chưa có dữ liệu.</p>"; 
+                return; 
+            }
+
+            let htmlContent = ""; // Gom chuỗi HTML để tránh lỗi ghi đè vòng lặp DOM
 
             filtered.forEach(cus => {
                 let tagUI = "", tagLabel = "";
@@ -505,26 +512,30 @@
                 let cardClass = cus.isUrgent ? "card urgent" : "card";
                 let urgentBadge = cus.isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${cus.limitDays} NGÀY CHƯA TƯ VẤN</div>` : "";
                 
-                let cleanPhone = cus.phone.replace(/\D/g, '');
+                // Tránh lỗi khi số điện thoại không tồn tại trong data cũ
+                let cleanPhone = cus.phone ? String(cus.phone).replace(/\D/g, '') : '';
+                let cusName = cus.name || 'Khách hàng';
+                let cusCar = cus.car || 'Đang cập nhật';
+                let cusPhone = cus.phone || 'Chưa có SĐT';
 
                 let html = `
                     <div class="${cardClass}">
                         ${urgentBadge}
                         <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items: center;">
-                            <h3 style="margin:0; color:var(--primary); font-size:17px; font-weight:800;">${cus.name}</h3>
+                            <h3 style="margin:0; color:var(--primary); font-size:17px; font-weight:800;">${cusName}</h3>
                             <span class="tag ${tagUI}">${tagLabel}</span>
                         </div>
                         <div class="cus-info">
                             <p>📞 SĐT: 
                                 <strong>
-                                    <a href="tel:${cus.phone}" style="color:var(--accent); text-decoration:none;">${cus.phone}</a>
+                                    <a href="tel:${cusPhone}" style="color:var(--accent); text-decoration:none;">${cusPhone}</a>
                                     <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon" title="Chat Zalo">
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
                                     </a>
                                 </strong>
                             </p>
-                            <p>🚗 Xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
-                            <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
+                            <p>🚗 Xe: <strong>${cusCar}</strong> (${cus.year_color || ''})</p>
+                            <p>💰 Tài chính: <strong>${cus.finance || ''}</strong></p>
                             <p>📝 Ghi chú: <strong>${cus.details || 'Không có'}</strong></p>
                         </div>
                 `;
@@ -535,10 +546,10 @@
                     html += `</div>`;
                 }
 
-                let lastCheckStr = new Date(cus.last_checked).toLocaleString('vi-VN');
+                let lastCheckStr = cus.last_checked ? new Date(cus.last_checked).toLocaleString('vi-VN') : 'Chưa cập nhật';
 
                 if (cus.status === 'chot') {
-                    let closedTime = new Date(cus.closed_at).toLocaleString('vi-VN');
+                    let closedTime = cus.closed_at ? new Date(cus.closed_at).toLocaleString('vi-VN') : 'Đã chốt';
                     html += `
                         <div style="margin-top:15px; border-top: 1px solid var(--border); padding-top:12px;">
                             <p style="font-size:11px; color:var(--success); margin:0 0 10px 0; font-weight:bold;">🎉 Chốt ngày: ${closedTime}</p>
@@ -560,8 +571,11 @@
                 }
 
                 html += `</div>`;
-                listDiv.innerHTML += html;
+                htmlContent += html;
             });
+
+            // Gắn mã HTML 1 lần duy nhất cho danh sách để tránh ngắt hiển thị
+            listDiv.innerHTML = htmlContent;
         }
 
         // --- 6. CÁC HÀM XỬ LÝ NÚT BẤM CRM ---
@@ -588,8 +602,6 @@
         }
 
         // --- 7. LOGIC SĂN TIN MỚI (BẤT KHẢ XÂM PHẠM) ---
-
-        // 1. Tự động load cấu hình hiện tại từ Firebase lên các ô nhập
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()) {
                 const d = snap.val();
@@ -599,7 +611,6 @@
             }
         });
 
-        // 2. Hàm lưu cấu hình mới xuống config_bot để Bot ở Laptop nhận lệnh
         function saveBotSettings() {
             const btn = document.getElementById('btn-save-hunt');
             btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
@@ -613,14 +624,12 @@
             });
         }
 
-        // 3. Hàm xóa tin đã săn được
         function deleteHuntedItem(id) {
             if(confirm("Xóa tin này?")) {
                 db.ref('san_tin/' + id).remove().then(() => showToast("Đã xóa!"));
             }
         }
 
-        // 4. Lắng nghe node 'san_tin' để hiển thị bài mới săn được
         db.ref('san_tin').limitToLast(20).on('value', snap => {
             const div = document.getElementById('list-hunted'); 
             div.innerHTML = "";
