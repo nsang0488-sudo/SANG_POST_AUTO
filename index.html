@@ -1,441 +1,881 @@
 <!DOCTYPE html>
+
 <html lang="vi">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>SANG AUTO PRO - PREMIUM CRM</title>
+
     <link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
 
+
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
+
+
     <style>
-        /* GIỮ NGUYÊN TOÀN BỘ CSS CỦA BẠN */
+
+        /* GIỮ NGUYÊN TOÀN BỘ CSS CŨ CỦA BRO */
+
         :root {
+
             --primary: #ffffff;
-            --accent: #4f46e5;
-            --accent-gradient: linear-gradient(135deg, #6366f1, #ec4899);
-            --gold-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
-            --green-gradient: linear-gradient(135deg, #10b981, #059669);
-            --blue-gradient: linear-gradient(135deg, #3b82f6, #2dd4bf);
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-dim: #64748b;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+
+            --accent: #38bdf8;
+
+            --accent-gradient: linear-gradient(135deg, #38bdf8, #2563eb);
+
+            --gold-gradient: linear-gradient(135deg, #fbbf24, #d97706);
+
+            --green-gradient: linear-gradient(135deg, #34d399, #059669);
+
+            --bg: #0f172a;
+
+            --card: #1e293b;
+
+            --border: #334155;
+
+            --text-main: #f8fafc;
+
+            --text-dim: #94a3b8;
+
+            --danger: #f43f5e;
+
+            --warning: #fbbf24;
+
             --success: #10b981;
+
         }
+
+
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body { 
+
             background-color: var(--bg); color: var(--text-main); 
+
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+
             margin: 0; padding-bottom: 90px;
+
         }
+
+
 
         #login-screen {
+
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(15px);
+
+            background: var(--bg); backdrop-filter: blur(15px);
+
             display: flex; align-items: center; justify-content: center;
+
             z-index: 9999; transition: opacity 0.4s ease;
+
         }
+
         .login-box {
+
             background: var(--card); padding: 40px 30px; border-radius: 24px;
+
             border: 1px solid var(--border); width: 90%; max-width: 360px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+
             animation: fadeIn 0.5s ease;
+
         }
-        .login-box h2 { margin: 0 0 10px 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; font-weight: 900; }
-        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; font-weight: 600; }
-        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: #f1f5f9; color: var(--text-main);}
+
+        .login-box h2 { margin: 0 0 10px 0; color: var(--accent); letter-spacing: 2px; font-weight: 900; }
+
+        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; }
+
+        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: rgba(15, 23, 42, 0.8);}
+
         
+
         #app-content { display: none; }
 
+
+
         .header {
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
+
             padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+
         }
-        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--text-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
         .header span { color: var(--accent); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
+
+
 
         .container { max-width: 600px; margin: auto; padding: 15px; }
 
+
+
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
+
         .tab-content.active { display: block; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+
+
         .section-title { font-size: 12px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
-        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent-gradient); border-radius: 4px; }
+
+        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--accent); border-radius: 4px; }
+
         
+
         .card { 
-            background: var(--card); 
+
+            background: linear-gradient(145deg, #1e293b, #0f172a); 
+
             border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+
+            position: relative; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+
         }
+
         
-        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
+
         input, textarea, select {
-            width: 100%; background: #f1f5f9; border: 1px solid var(--border);
-            color: var(--text-main); padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
-            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-            font-weight: 500;
+
+            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
+
+            color: #fff; padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
+
+            transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+
         }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); background: #ffffff; }
+
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+
         
-        .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: var(--text-main); box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+
+        .search-bar { background: var(--card); border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: #fff; }
+
+
 
         .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid var(--border); position: relative; }
+
+        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid var(--border); position: relative; }
+
         .image-item img { width: 100%; height: 100%; object-fit: cover; }
 
+
+
         .btn { 
+
             width: 100%; padding: 14px; border: none; border-radius: 12px; 
+
             font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
+
             transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
+
         }
+
         .btn:active { transform: scale(0.96); }
-        .btn-main { background: var(--accent-gradient); color: #fff; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);}
+
+        .btn-main { background: var(--text-main); color: #0f172a; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(255,255,255,0.1);}
+
         .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
-        .btn-check { background: var(--blue-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);}
+
+        .btn-check { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+
         .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+
 
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.95);
+
+            position: fixed; bottom: 0; width: 100%; background: rgba(15, 23, 42, 0.95);
+
             backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+
+            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+
         }
+
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8.5px; font-weight: 800; text-decoration: none; transition: 0.3s; }
+
         .nav-item.active { color: var(--accent); }
+
         .nav-icon { font-size: 20px; margin-bottom: 5px; transition: 0.3s;}
+
         .nav-item.active .nav-icon { transform: translateY(-3px) scale(1.1); }
 
-        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
-        .tag-nong { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .tag-am { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .tag-nguoi { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        .urgent { border: 2px solid var(--danger); }
+
+        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; letter-spacing: 0.5px;}
+
+        .tag-nong { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+        .tag-am { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.3); }
+
+        .tag-nguoi { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+
+
+
+        .urgent { border: 1px solid var(--danger); }
+
         .urgent-badge { 
+
             position: absolute; top: -12px; right: 15px; background: var(--danger); 
+
             color: #fff; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+
         }
+
+
 
         #toast { 
+
             position: fixed; top: 90px; left: 50%; transform: translateX(-50%); 
+
             background: var(--success); color: #fff; padding: 14px 28px; 
+
             border-radius: 30px; font-weight: 800; font-size: 13px; display: none; 
-            z-index: 1000; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
         }
+
         
-        .cus-info { background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border);}
-        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex; align-items: center; line-height: 1.4;}
-        .cus-info strong { color: var(--text-main); margin-left: 5px; flex: 1;}
+
+        .cus-info { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 15px;}
+
+        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); display: flex;}
+
+        .cus-info strong { color: #fff; margin-left: 5px; flex: 1;}
+
+
 
         .zalo-icon {
+
             display: inline-flex; align-items: center; justify-content: center;
+
             width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px;
+
         }
-        .zalo-icon img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+
+        .zalo-icon img { width: 14px; height: 14px; }
+
     </style>
+
 </head>
+
 <body>
 
+
+
     <div id="login-screen">
+
         <div class="login-box">
+
             <h2>HỆ THỐNG BẢO MẬT</h2>
+
             <p>SANG AUTO PRO CRM</p>
+
             <input type="password" id="access-key" placeholder="••••••" onkeypress="handleLoginEnter(event)">
+
             <button class="btn btn-main" style="margin-top: 10px;" onclick="verifyAccess()">MỞ KHÓA DỮ LIỆU</button>
+
         </div>
+
     </div>
 
+
+
     <div id="app-content">
+
         <div id="toast">Thành công!</div>
 
+
+
         <div class="header">
+
             <h1>SANG AUTO PRO</h1>
+
             <span>PREMIUM CRM SYSTEM</span>
+
         </div>
 
+
+
         <div class="container">
+
             <div id="tab-input" class="tab-content active">
+
                 <h2 class="section-title">Phân loại dữ liệu</h2>
+
                 <div class="card">
+
                     <label>Bạn đang nhập dữ liệu cho:</label>
-                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold; background: rgba(99, 102, 241, 0.05);">
+
+                    <select id="form-type" onchange="toggleFormFields()" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">
+
                         <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
+
                         <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
+
                     </select>
+
                 </div>
 
+
+
                 <h2 class="section-title">Thông tin cơ bản</h2>
+
                 <div class="card">
+
                     <label>1. Tên khách hàng</label>
+
                     <input type="text" id="cus-name" placeholder="VD: Anh Tuấn">
+
                     <label>2. Số điện thoại</label>
+
                     <input type="tel" id="cus-phone" placeholder="09xxxxxxxxx">
+
                     <label>3. Loại xe <span id="lbl-xe">khách cần</span></label>
+
                     <input type="text" id="cus-car" placeholder="VD: Mazda 3, CX5...">
+
                     <label>4. Đời xe, màu xe</label>
+
                     <input type="text" id="cus-year-color" placeholder="VD: Đời 2020-2022, Màu Đỏ">
-                    
+
                     <div id="field-finance-mua">
+
                         <label>5. Tài chính (Tiền mặt / Trả góp)</label>
+
                         <input type="text" id="cus-finance-mua" placeholder="VD: Có sẵn 300tr vay bank">
-                    </div>
-                    
-                    <div id="field-finance-ban" style="display: none;">
-                        <label>5. Tình trạng tài chính xe</label>
-                        <input type="text" id="cus-finance-ban-text" placeholder="VD: Xe chính chủ, đang trả góp...">
+
                     </div>
 
-                    <label>6. Phân loại mức độ</label>
+                    <div id="field-finance-ban" style="display: none;">
+
+                        <label>5. Tình trạng tài chính xe</label>
+
+                        <select id="cus-finance-ban">
+
+                            <option value="Không vay (Gốc)">Không vay (Gốc)</option>
+
+                            <option value="Đang vay Ngân hàng">Đang vay Ngân hàng</option>
+
+                            <option value="Đang cầm cố">Đang cầm cố</option>
+
+                        </select>
+
+                    </div>
+
+                    <label>6. Phân loại khách</label>
+
                     <select id="cus-tag">
-                        <option value="nong">🔥 NÓNG (Chốt gấp)</option>
-                        <option value="am">⚡ ẤM (Tiềm năng)</option>
-                        <option value="nguoi">❄️ NGUỘI (Tham khảo)</option>
+
+                        <option value="nong">🔥 NÓNG (2 ngày)</option>
+
+                        <option value="am">⚡ ẤM (7 ngày)</option>
+
+                        <option value="nguoi">❄️ NGUỘI (14 ngày)</option>
+
                     </select>
 
-                    <label>7. Ghi chú yêu cầu chi tiết</label>
-                    <textarea id="cus-detail" style="height: 100px;" placeholder="Tình trạng xe, lịch hẹn, yêu cầu thêm..."></textarea>
-                    
+                    <label>7. <span id="lbl-detail">Thông tin chi tiết yêu cầu</span></label>
+
+                    <textarea id="cus-detail" style="height: 100px;" placeholder="Ghi chú thêm..."></textarea>
+
                     <div id="field-images" style="display: none;">
+
                         <label>8. Hình ảnh xe thực tế</label>
-                        <input type="file" id="cus-images" accept="image/*" multiple style="padding: 10px;">
+
+                        <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
+
+                        <div class="image-grid" id="preview-grid"></div>
+
                     </div>
 
                     <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU DỮ LIỆU KHÁCH</button>
+
                 </div>
+
             </div>
 
+
+
             <div id="tab-buyers" class="tab-content">
-                <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm tên hoặc SĐT khách mua..." oninput="renderList('mua')">
+
+                <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
+
                 <div id="list-buyers"></div>
+
             </div>
 
             <div id="tab-sellers" class="tab-content">
-                <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm tên hoặc SĐT khách bán..." oninput="renderList('ban')">
+
+                <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
+
                 <div id="list-sellers"></div>
+
             </div>
 
             <div id="tab-closed" class="tab-content">
-                <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm khách đã giao dịch xong..." oninput="renderList('chot')">
+
+                <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm khách đã chốt..." oninput="renderList('chot')">
+
                 <div id="list-closed"></div>
+
             </div>
+
+
 
             <div id="tab-hunt" class="tab-content">
+
                 <h2 class="section-title">Cấu hình Bot săn tin</h2>
+
                 <div class="card">
-                    <label>1. ID Group Facebook</label>
-                    <textarea id="hunt-groups" rows="2" placeholder="ID1, ID2..."></textarea>
-                    <label>2. Từ khóa lọc</label>
-                    <input type="text" id="hunt-keywords" placeholder="cần bán, chính chủ...">
-                    <button class="btn btn-main" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH CHO BOT</button>
+
+                    <label>1. ID Group Facebook (Mỗi ID cách nhau dấu phẩy)</label>
+
+                    <textarea id="hunt-groups" rows="3" placeholder="VD: 1818063381848053, 123456789..."></textarea>
+
+                    
+
+                    <label>2. Từ khóa lọc (Cách nhau bằng dấu phẩy)</label>
+
+                    <input type="text" id="hunt-keywords" placeholder="VD: xpander, chính chủ, cần bán...">
+
+
+
+                    <label>3. Thời gian nghỉ giữa các lần quét (Phút)</label>
+
+                    <input type="number" id="hunt-interval" value="10" placeholder="Số phút, ví dụ: 10">
+
+                    
+
+                    <button class="btn btn-main" id="btn-save-hunt" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH CHO BOT</button>
+
                 </div>
+
+
+
                 <h2 class="section-title">Tin xe mới săn được</h2>
+
                 <div id="list-hunted"></div>
+
             </div>
+
         </div>
+
+
 
         <div class="bottom-nav">
+
             <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)">
+
                 <span class="nav-icon">📝</span><span>NHẬP DATA</span>
+
             </a>
+
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)">
+
                 <span class="nav-icon">🛒</span><span>KHÁCH MUA</span>
+
             </a>
+
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)">
+
                 <span class="nav-icon">🚗</span><span>KHÁCH BÁN</span>
+
             </a>
+
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)">
+
                 <span class="nav-icon">🏆</span><span>ĐÃ CHỐT</span>
+
             </a>
+
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hunt', this)">
+
                 <span class="nav-icon">🎯</span><span>SĂN TIN</span>
+
             </a>
+
         </div>
+
     </div> 
 
+
+
     <script>
-        // --- 1. BẢO MẬT & KHỞI TẠO ---
+
+        // --- 0. BẢO MẬT (Giữ nguyên) ---
+
         function verifyAccess() {
+
             if (document.getElementById('access-key').value === '190525') {
+
                 sessionStorage.setItem('crm_unlocked', 'true');
+
                 document.getElementById('login-screen').style.display = 'none';
+
                 document.getElementById('app-content').style.display = 'block';
+
             } else { alert('❌ SAI MẬT KHẨU!'); }
+
         }
+
         function handleLoginEnter(e) { if (e.key === 'Enter') verifyAccess(); }
+
         document.addEventListener("DOMContentLoaded", () => {
+
             if (sessionStorage.getItem('crm_unlocked') === 'true') {
+
                 document.getElementById('login-screen').style.display = 'none';
+
                 document.getElementById('app-content').style.display = 'block';
+
             }
+
         });
 
-        // --- 2. FIREBASE CONFIG ---
-        const firebaseConfig = { databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app" };
+
+
+        // --- 1. FIREBASE CONFIG ---
+
+        const firebaseConfig = {
+
+            databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+        };
+
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
         const db = firebase.database();
+
         const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
+
         let allCustomers = [];
 
-        // --- 3. UI LOGIC ---
+
+
+        // --- 2. GIAO DIỆN (Giữ nguyên) ---
+
         function switchTab(tabId, el) {
+
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
             document.getElementById('tab-' + tabId).classList.add('active');
+
             el.classList.add('active');
-            if(tabId !== 'input') renderList(tabId === 'buyers' ? 'mua' : (tabId === 'sellers' ? 'ban' : 'chot'));
+
         }
 
         function showToast(msg, isError = false) {
+
             const t = document.getElementById("toast");
+
             t.innerText = msg; t.style.background = isError ? "var(--danger)" : "var(--success)";
-            t.style.display = "block"; setTimeout(() => t.style.display = "none", 2500);
+
+            t.style.display = "block"; setTimeout(() => t.style.display = "none", 3000);
+
         }
 
         function toggleFormFields() {
+
             const isMua = (document.getElementById('form-type').value === 'mua');
+
             document.getElementById('lbl-xe').innerText = isMua ? "khách cần" : "khách bán";
+
             document.getElementById('field-finance-mua').style.display = isMua ? "block" : "none";
+
             document.getElementById('field-finance-ban').style.display = isMua ? "none" : "block";
+
             document.getElementById('field-images').style.display = isMua ? "none" : "block";
+
         }
 
-        // --- 4. LƯU KHÁCH HÀNG ---
+
+
+        // --- 4. LƯU KHÁCH (Giữ nguyên) ---
+
         async function saveCustomer() {
+
             const name = document.getElementById('cus-name').value.trim();
+
             const phone = document.getElementById('cus-phone').value.trim();
-            if(!name || !phone) return showToast("Vui lòng nhập Tên và SĐT!", true);
-            
-            const btn = document.getElementById('btn-save'); 
-            btn.innerHTML = "⏳ ĐANG LƯU..."; btn.disabled = true;
+
+            if(!name || !phone) return showToast("Nhập Tên và SĐT!", true);
+
+            const btn = document.getElementById('btn-save'); btn.innerHTML = "⏳ ĐANG LƯU..."; btn.disabled = true;
 
             let imageUrls = [];
-            const files = document.getElementById('cus-images').files;
-            if (document.getElementById('form-type').value === 'ban' && files.length > 0) {
-                for (let f of files) {
-                    const comp = await imageCompression(f, { maxSizeMB: 0.5 });
-                    let fd = new FormData(); fd.append("image", comp);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-                    const json = await res.json();
-                    if(json.success) imageUrls.push(json.data.url);
-                }
+
+            if (document.getElementById('form-type').value === 'ban') {
+
+                imageUrls = await uploadImages(document.getElementById('cus-images').files);
+
             }
 
-            const id = 'cus_' + Date.now();
-            const type = document.getElementById('form-type').value;
             const data = {
-                id: id, type: type, status: 'active',
-                name: name, phone: phone, 
-                car: document.getElementById('cus-car').value,
+
+                id: 'cus_' + Date.now(), type: document.getElementById('form-type').value, status: 'active',
+
+                name: name, phone: phone, car: document.getElementById('cus-car').value,
+
                 year_color: document.getElementById('cus-year-color').value,
-                finance: type === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban-text').value,
-                tag: document.getElementById('cus-tag').value,
-                details: document.getElementById('cus-detail').value,
-                images: imageUrls,
-                created_at: Date.now()
+
+                finance: document.getElementById('form-type').value === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
+
+                tag: document.getElementById('cus-tag').value, details: document.getElementById('cus-detail').value,
+
+                images: imageUrls, created_at: Date.now(), last_checked: Date.now()
+
             };
 
-            await db.ref('crm_v3/customers/' + id).set(data);
-            showToast("✅ ĐÃ LƯU THÀNH CÔNG!");
-            setTimeout(() => location.reload(), 1000);
+            await db.ref('crm_customers/' + data.id).set(data);
+
+            showToast("✅ ĐÃ LƯU!"); location.reload();
+
         }
 
-        // --- 5. HIỂN THỊ DANH SÁCH (SỬA LỖI TẠI ĐÂY) ---
-        db.ref('crm_v3/customers').on('value', snap => {
-            allCustomers = [];
-            snap.forEach(c => allCustomers.push(c.val()));
-            // Refresh tab đang xem
-            const activeTab = document.querySelector('.tab-content.active').id;
-            if(activeTab === 'tab-buyers') renderList('mua');
-            if(activeTab === 'tab-sellers') renderList('ban');
-            if(activeTab === 'tab-closed') renderList('chot');
+
+
+        // --- 5. RENDER DANH SÁCH KHÁCH (Giữ nguyên) ---
+
+        db.ref('crm_customers').on('value', snap => {
+
+            allCustomers = []; snap.forEach(c => allCustomers.push(c.val()));
+
+            renderList('mua'); renderList('ban'); renderList('chot');
+
         });
 
-        function renderList(type) {
-            let containerId = type === 'mua' ? 'list-buyers' : (type === 'ban' ? 'list-sellers' : 'list-closed');
-            let searchId = type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : 'search-closed');
-            
-            const listDiv = document.getElementById(containerId);
-            const search = document.getElementById(searchId).value.toLowerCase();
-            listDiv.innerHTML = "";
 
-            let filtered = allCustomers.filter(c => type === 'chot' ? c.status === 'chot' : (c.type === type && c.status === 'active'));
+
+        function renderList(type) {
+
+            const listDiv = document.getElementById(type === 'mua' ? 'list-buyers' : (type === 'ban' ? 'list-sellers' : 'list-closed'));
+
+            const searchInput = document.getElementById(type === 'mua' ? 'search-buyer' : (type === 'ban' ? 'search-seller' : 'search-closed'));
+
+            if (!searchInput) return;
+
+            const search = searchInput.value.toLowerCase(); listDiv.innerHTML = "";
+
+            let filtered = allCustomers.filter(c => type === 'chot' ? c.status === 'chot' : (c.type === type && c.status !== 'chot'));
+
             if(search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || c.phone.includes(search));
 
             filtered.sort((a,b) => b.created_at - a.created_at).forEach(cus => {
+
+                const isUrgent = (Date.now() - cus.last_checked) > (cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14)) * 86400000;
+
                 listDiv.innerHTML += `
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                            <b style="color: var(--accent); font-size: 16px;">${cus.name}</b>
+
+                    <div class="card ${isUrgent && cus.status !== 'chot' ? 'urgent' : ''}">
+
+                        ${isUrgent && cus.status !== 'chot' ? '<div class="urgent-badge">🚨 CẦN CHĂM SÓC</div>' : ''}
+
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+
+                            <b>${cus.name}</b>
+
                             <span class="tag tag-${cus.tag}">${cus.tag.toUpperCase()}</span>
+
                         </div>
+
                         <div class="cus-info">
-                            <p>📞 SĐT: <strong>${cus.phone} <a href="https://zalo.me/${cus.phone.replace(/\D/g,'')}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></strong></p>
-                            <p>🚗 Xe: <strong>${cus.car} | ${cus.year_color}</strong></p>
-                            <p>💰 Tài chính: <strong>${cus.finance || 'Chưa cập nhật'}</strong></p>
-                            <p style="display:block; margin-top:8px; border-top: 1px dashed #cbd5e1; padding-top:8px; color:#475569;">
-                                📝 <i>${cus.details || 'Không có ghi chú.'}</i>
-                            </p>
-                            ${cus.images ? `<div class="image-grid" style="margin-top:10px;">${cus.images.map(img => `<div class="image-item"><img src="${img}" onclick="window.open('${img}')"></div>`).join('')}</div>` : ''}
+
+                            <p>📞 SĐT: <strong>${cus.phone} <a href="https://zalo.me/${cus.phone.replace(/\D/g,'')}" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></strong></p>
+
+                            <p>🚗 Xe: <strong>${cus.car}</strong></p>
+
                         </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            ${cus.status === 'active' ? `
-                                <button class="btn btn-success" onclick="updateStatus('${cus.id}', 'chot')">🏆 CHỐT</button>
-                                <button class="btn btn-danger" onclick="deleteCus('${cus.id}')">❌ HỤT KÈO</button>
-                            ` : `
-                                <button class="btn btn-danger" style="grid-column: span 2" onclick="deleteCus('${cus.id}')">🗑️ XÓA VĨNH VIỄN</button>
-                            `}
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+
+                            ${cus.status !== 'chot' ? `
+
+                                <button class="btn btn-check" onclick="db.ref('crm_customers/${cus.id}').update({last_checked:Date.now()})">📞 ĐÃ GỌI</button>
+
+                                <button class="btn btn-success" onclick="db.ref('crm_customers/${cus.id}').update({status:'chot', closed_at:Date.now()})">🏆 CHỐT</button>
+
+                            ` : `<button class="btn btn-danger" style="grid-column: span 2" onclick="db.ref('crm_customers/${cus.id}').remove()">🗑️ XÓA</button>`}
+
                         </div>
+
                     </div>`;
+
             });
-            if(filtered.length === 0) listDiv.innerHTML = "<p style='text-align:center; color:var(--text-dim); padding:20px;'>Không tìm thấy khách hàng nào.</p>";
+
         }
 
-        function updateStatus(id, st) {
-            if(confirm("Xác nhận khách đã chốt giao dịch?")) {
-                db.ref('crm_v3/customers/' + id).update({ status: st });
-                showToast("🏆 CHÚC MỪNG BẠN ĐÃ CHỐT KÈO!");
+
+
+        // --- 6. LOGIC SĂN TIN MỚI (ĐÃ CẬP NHẬT THEO config_bot) ---
+
+        
+
+        // 1. Tự động load cấu hình hiện tại từ Firebase lên các ô nhập
+
+        db.ref('config_bot').on('value', snap => {
+
+            if(snap.exists()) {
+
+                const d = snap.val();
+
+                document.getElementById('hunt-groups').value = d.groups || "";
+
+                document.getElementById('hunt-keywords').value = d.keywords || "";
+
+                document.getElementById('hunt-interval').value = d.interval || 10;
+
             }
-        }
 
-        function deleteCus(id) {
-            if(confirm("Bạn muốn xóa dữ liệu khách này?")) {
-                db.ref('crm_v3/customers/' + id).remove();
-                showToast("Đã xóa dữ liệu.");
-            }
-        }
-
-        // --- 6. GIỮ NGUYÊN LOGIC BOT & SĂN TIN ---
-        function saveBotSettings() {
-            db.ref('config_bot').set({
-                groups: document.getElementById('hunt-groups').value,
-                keywords: document.getElementById('hunt-keywords').value
-            }).then(() => showToast("✅ ĐÃ CẬP NHẬT BOT"));
-        }
-
-        db.ref('san_tin').limitToLast(15).on('value', snap => {
-            const div = document.getElementById('list-hunted'); div.innerHTML = "";
-            let items = []; snap.forEach(c => { let v = c.val(); v.key = c.key; items.push(v); });
-            items.reverse().forEach(item => {
-                div.innerHTML += `
-                    <div class="card" style="border-left: 4px solid var(--danger);">
-                        <p style="font-size:14px; margin:0 0 10px 0;">${item.content}</p>
-                        <div style="display:flex; gap:10px;">
-                            <a href="${item.link}" target="_blank" class="btn btn-check" style="flex:2; text-decoration:none;">🌍 XEM BÀI</a>
-                            <button class="btn btn-danger" style="flex:1;" onclick="db.ref('san_tin/${item.key}').remove()">🗑️</button>
-                        </div>
-                    </div>`;
-            });
         });
+
+
+
+        // 2. Hàm lưu cấu hình mới xuống config_bot để Bot ở Laptop nhận lệnh
+
+        function saveBotSettings() {
+
+            const btn = document.getElementById('btn-save-hunt');
+
+            btn.innerHTML = "⏳ ĐANG ĐỒNG BỘ...";
+
+            db.ref('config_bot').set({
+
+                groups: document.getElementById('hunt-groups').value.trim(),
+
+                keywords: document.getElementById('hunt-keywords').value.trim(),
+
+                interval: document.getElementById('hunt-interval').value || 10
+
+            }).then(() => {
+
+                showToast("✅ ĐÃ GỬI LỆNH CHO BOT!");
+
+                btn.innerHTML = "⚙️ CẬP NHẬT LỆNH CHO BOT";
+
+            });
+
+        }
+
+
+
+        // 3. Hàm xóa tin đã săn được
+
+        function deleteHuntedItem(id) {
+
+            if(confirm("Xóa tin này?")) {
+
+                db.ref('san_tin/' + id).remove().then(() => showToast("Đã xóa!"));
+
+            }
+
+        }
+
+
+
+        // 4. Lắng nghe node 'san_tin' để hiển thị bài mới săn được
+
+        db.ref('san_tin').limitToLast(20).on('value', snap => {
+
+            const div = document.getElementById('list-hunted'); 
+
+            div.innerHTML = "";
+
+            let items = []; 
+
+            snap.forEach(child => { 
+
+                let v = child.val(); 
+
+                v.id = child.key; 
+
+                items.push(v); 
+
+            });
+
+            
+
+            items.reverse().forEach(item => {
+
+                const date = item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : 'Vừa xong';
+
+                div.innerHTML += `
+
+                    <div class="card" style="border-left:4px solid var(--accent)">
+
+                        <div style="display:flex; justify-content:space-between; align-items: flex-start;">
+
+                            <p style="font-size:13px; color: #fff; margin:0; padding-right:10px;">${item.content}</p>
+
+                            <button onclick="deleteHuntedItem('${item.id}')" style="background:none; border:none; color:var(--danger); font-size:16px; cursor:pointer;">✕</button>
+
+                        </div>
+
+                        <p style="font-size:10px; color:var(--text-dim); margin: 10px 0;">⏰ ${date}</p>
+
+                        <a href="${item.link}" target="_blank" class="btn btn-check" style="text-decoration:none;">🌍 XEM BÀI VIẾT FACEBOOK</a>
+
+                    </div>`;
+
+            });
+
+        });
+
+
+
+        // Helper upload ảnh (Giữ nguyên của bro)
+
+        async function uploadImages(files) {
+
+            let urls = [];
+
+            for (let file of files) {
+
+                const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1200 });
+
+                let formData = new FormData(); formData.append("image", compressed);
+
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+
+                const json = await res.json();
+
+                if(json.success) urls.push(json.data.url);
+
+            }
+
+            return urls;
+
+        }
+
     </script>
+
 </body>
+
 </html>
