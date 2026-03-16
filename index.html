@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
     <style>
-        /* --- GIAO DIỆN SÁNG VÀ NHIỀU MÀU SẮC --- */
+        /* --- GIỮ NGUYÊN CSS CỦA BẠN --- */
         :root {
             --primary: #2563eb;
             --accent: #0ea5e9;
@@ -265,7 +265,7 @@
     </div> 
 
     <script>
-        // --- FIREBASE CONFIG (GIỮ NGUYÊN) ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
             databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -414,7 +414,7 @@
         function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
         function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
 
-        // --- BOT SĂN TIN (XỬ LÝ CHIA LINK VÀ GIAO DIỆN MỚI) ---
+        // --- PHẦN BOT SĂN TIN (ĐÃ SỬA LẠI ĐỂ ĐỌC ĐÚNG NHÁNH san_tin_chotot) ---
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()){
                 const d = snap.val();
@@ -433,42 +433,61 @@
             alert("Đã cập nhật lệnh Bot!");
         }
 
-        db.ref('san_tin').limitToLast(100).on('value', snap => {
+        // Hàm render chung cho cả 2 nguồn
+        function renderHuntedData() {
             const divFb = document.getElementById('list-hunted-fb');
             const divCt = document.getElementById('list-hunted-chotot');
+            
+            // Xóa dữ liệu cũ để tránh trùng lặp khi listener gọi lại
             divFb.innerHTML = ""; divCt.innerHTML = "";
-            
-            let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; items.push(v); });
-            
-            items.reverse().forEach(item => {
+
+            // Listener cho nhánh FACEBOOK (san_tin)
+            db.ref('san_tin').limitToLast(50).on('value', snap => {
+                let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; v.path = 'san_tin'; items.push(v); });
+                renderToBox(items.reverse(), divFb, '#1877F2');
+            });
+
+            // Listener cho nhánh CHỢ TỐT (san_tin_chotot)
+            db.ref('san_tin_chotot').limitToLast(50).on('value', snap => {
+                let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; v.path = 'san_tin_chotot'; items.push(v); });
+                renderToBox(items.reverse(), divCt, '#f59e0b');
+            });
+        }
+
+        function renderToBox(items, container, color) {
+            if (items.length === 0) {
+                container.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có dữ liệu.</p>";
+                return;
+            }
+            let html = "";
+            items.forEach(item => {
                 const isRead = item.isRead ? 'read' : '';
-                const accentColor = item.link?.includes('facebook.com') ? '#1877F2' : '#f59e0b';
-                
-                const cardHtml = `
-                <div class="card card-hunted-compact ${isRead}" id="hunt-${item.id}" style="border-left:4px solid ${item.isRead ? 'var(--border)' : accentColor}">
+                // Xử lý hiển thị nếu content/phone trống
+                const title = item.title || "";
+                const phone = item.phone ? ` - 📞 ${item.phone}` : "";
+                const keyword = item.keyword ? ` [Từ khóa: ${item.keyword}]` : "";
+                const contentText = item.content || (title + keyword) || "Bấm xem để biết chi tiết";
+
+                html += `
+                <div class="card card-hunted-compact ${isRead}" id="hunt-${item.id}" style="border-left:4px solid ${item.isRead ? 'var(--border)' : color}">
                     <div class="hunted-text-box">
-                        <p>${item.content || 'Không có nội dung'}</p>
+                        <p>${contentText}${phone}</p>
                     </div>
                     <div class="hunted-btns-compact">
                         <a href="${item.link}" target="_blank" class="btn btn-check btn-mini">🌍 XEM</a>
-                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.id}')">✔️</button>
-                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.id}')">🗑️</button>
+                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.path}', '${item.id}')">✔️</button>
+                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.path}', '${item.id}')">🗑️</button>
                     </div>
                 </div>`;
-
-                // Tự động phân loại link
-                if (item.link?.includes('chotot.com')) {
-                    divCt.innerHTML += cardHtml;
-                } else {
-                    divFb.innerHTML += cardHtml;
-                }
             });
-            if(divFb.innerHTML === "") divFb.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có tin FB.</p>";
-            if(divCt.innerHTML === "") divCt.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có tin Chợ Tốt.</p>";
-        });
+            container.innerHTML = html;
+        }
 
-        function markHuntedRead(id) { db.ref('san_tin/' + id).update({ isRead: true }); }
-        function deleteHunted(id) { if(confirm("Xóa tin này?")) db.ref('san_tin/' + id).remove(); }
+        function markHuntedRead(path, id) { db.ref(path + '/' + id).update({ isRead: true }); }
+        function deleteHunted(path, id) { if(confirm("Xóa tin này?")) db.ref(path + '/' + id).remove(); }
+
+        // Chạy hàm render khi web tải xong
+        renderHuntedData();
     </script>
 </body>
 </html>
