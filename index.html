@@ -19,11 +19,11 @@
             --gold-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
             --green-gradient: linear-gradient(135deg, #34d399, #10b981);
             --purple-gradient: linear-gradient(135deg, #c084fc, #9333ea);
-            --bg: #f0f4f8; /* Nền xám nhạt sáng sủa */
-            --card: #ffffff; /* Thẻ trắng tinh */
+            --bg: #f0f4f8; 
+            --card: #ffffff; 
             --border: #e2e8f0;
-            --text-main: #1e293b; /* Chữ màu tối */
-            --text-dim: #64748b; /* Chữ xám */
+            --text-main: #1e293b; 
+            --text-dim: #64748b; 
             --danger: #ef4444;
             --warning: #f59e0b;
             --success: #10b981;
@@ -36,7 +36,6 @@
             margin: 0; padding-bottom: 90px;
         }
 
-        /* Khung đăng nhập sáng sủa */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(240, 244, 248, 0.85); backdrop-filter: blur(15px);
@@ -73,7 +72,6 @@
         .section-title { font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
         .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--primary); border-radius: 4px; }
         
-        /* Chỉnh Card nền trắng, viền mảnh */
         .card { 
             background: var(--card); 
             border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
@@ -86,7 +84,6 @@
             color: var(--text-main); padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
             transition: all 0.3s; font-weight: 500;
         }
-        input::placeholder, textarea::placeholder { color: #94a3b8; }
         input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15); background: #ffffff;}
         
         .search-bar { background: #ffffff; border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.02);}
@@ -119,11 +116,6 @@
         .tag-nong { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca;}
         .tag-am { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a;}
         .tag-nguoi { background: #f0f9ff; color: var(--primary); border: 1px solid #bae6fd;}
-        .tag-chot { background: var(--gold-gradient); color: #fff; border: none; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);}
-
-        .card.urgent { border: 1px solid var(--danger); background: #fff1f2; }
-        .urgent-badge { position: absolute; top: -12px; right: 15px; background: var(--danger); color: #fff; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px; animation: pulse 2s infinite; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);}
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         #toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--success); color: #fff; padding: 14px 28px; border-radius: 30px; font-weight: 800; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);}
         
@@ -135,58 +127,28 @@
 
         .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
 
-        /* --- BỔ SUNG: Giao diện thẻ săn tin siêu gọn --- */
-        .card-hunted-compact {
-            padding: 10px 12px !important;
-            margin-bottom: 8px !important;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            border-radius: 12px !important;
+        /* --- STYLE MỚI CHO SĂN TIN --- */
+        .hunt-category-title {
+            font-size: 11px; font-weight: 900; color: #64748b; 
+            margin: 20px 0 10px 5px; display: flex; align-items: center; gap: 6px;
         }
-        .hunted-text-box {
-            flex: 1;
-            overflow: hidden;
-        }
-        .hunted-text-box p {
-            margin: 0;
-            font-size: 13px;
-            white-space: nowrap; /* Cắt chữ trên 1 dòng */
-            overflow: hidden;
-            text-overflow: ellipsis; /* Hiện dấu ... */
-            color: var(--text-main);
-            font-weight: 500;
-        }
-        .hunted-btns-compact {
-            display: flex;
-            gap: 5px;
-            flex-shrink: 0;
-        }
-        .btn-mini {
-            padding: 6px 10px !important;
-            font-size: 11px !important;
-            width: auto !important;
-            border-radius: 8px !important;
-        }
+        .hunt-category-title.fb { color: #1877F2; }
+        .hunt-category-title.ct { color: #f59e0b; }
 
-        /* --- BỔ SUNG: Layout gọn cho Cấu hình Săn tin --- */
-        .hunt-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 5px;
+        .card-hunted-compact {
+            padding: 10px 12px !important; margin-bottom: 8px !important;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; border-radius: 12px !important;
         }
-        .hunt-grid .input-group {
-            display: flex;
-            flex-direction: column;
+        .hunted-text-box { flex: 1; overflow: hidden; }
+        .hunted-text-box p {
+            margin: 0; font-size: 13px; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; 
+            color: var(--text-main); font-weight: 500;
         }
-        .hunt-grid textarea {
-            height: 70px;
-            padding: 12px;
-            margin-bottom: 0;
-            font-size: 12px;
-        }
+        .hunted-btns-compact { display: flex; gap: 5px; flex-shrink: 0; }
+        .btn-mini { padding: 6px 10px !important; font-size: 11px !important; width: auto !important; border-radius: 8px !important; }
+
     </style>
 </head>
 <body>
@@ -213,7 +175,6 @@
                         <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
                     </select>
                 </div>
-
                 <h2 class="section-title">Thông tin cơ bản</h2>
                 <div class="card">
                     <label>Tên khách hàng</label>
@@ -274,34 +235,23 @@
 
             <div id="tab-hunt" class="tab-content">
                 <h2 class="section-title">Cấu hình Bot săn tin</h2>
-                <div class="card" style="padding-bottom: 15px;">
-                    <div class="hunt-grid">
-                        <div class="input-group">
-                            <label>Nhóm Facebook</label>
-                            <textarea id="hunt-fb" placeholder="Link hoặc ID..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label>Trang Chợ Tốt</label>
-                            <textarea id="hunt-chotot" placeholder="Link chuyên mục..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="hunt-grid" style="margin-top: 10px;">
-                        <div class="input-group">
-                            <label>Từ khóa lọc</label>
-                            <input type="text" id="hunt-keywords" placeholder="VD: vios, cx5..." style="margin-bottom:0; padding: 12px; font-size:13px;">
-                        </div>
-                        <div class="input-group">
-                            <label>Quét lại sau (Phút)</label>
-                            <input type="number" id="hunt-interval" value="10" style="margin-bottom:0; padding: 12px; font-size:13px;">
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-main" style="background: var(--purple-gradient); margin-top: 15px;" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
+                <div class="card">
+                    <label>ID Group Facebook</label>
+                    <textarea id="hunt-groups" rows="3"></textarea>
+                    <label>Từ khóa lọc</label>
+                    <input type="text" id="hunt-keywords">
+                    <label>Thời gian nghỉ (Phút)</label>
+                    <input type="number" id="hunt-interval" value="10">
+                    <button class="btn btn-main" style="background: var(--purple-gradient)" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
                 </div>
+
+                <h2 class="section-title">Dữ liệu săn được</h2>
                 
-                <h2 class="section-title">Tin mới săn được</h2>
-                <div id="list-hunted"></div>
+                <div class="hunt-category-title fb">🔵 FACEBOOK MARKET</div>
+                <div id="list-hunted-fb"></div>
+
+                <div class="hunt-category-title ct">🟠 CHỢ TỐT XE</div>
+                <div id="list-hunted-chotot"></div>
             </div>
         </div>
 
@@ -396,19 +346,13 @@
             const newId = 'cus_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             
             const data = {
-                id: newId,
-                type: type,
-                status: 'active',
-                name: name,
-                phone: phone,
+                id: newId, type: type, status: 'active', name: name, phone: phone,
                 car: document.getElementById('cus-car').value,
                 year_color: document.getElementById('cus-year-color').value,
                 finance: type === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
                 tag: document.getElementById('cus-tag').value,
                 details: document.getElementById('cus-detail').value,
-                images: imgs,
-                created_at: Date.now(),
-                last_checked: Date.now()
+                images: imgs, created_at: Date.now(), last_checked: Date.now()
             };
 
             await db.ref('crm_customers/' + newId).set(data);
@@ -428,39 +372,31 @@
         function renderList(tab) {
             const container = document.getElementById(tab === 'mua' ? 'list-buyers' : (tab === 'ban' ? 'list-sellers' : 'list-closed'));
             const search = document.getElementById(tab === 'mua' ? 'search-buyer' : (tab === 'ban' ? 'search-seller' : 'search-closed')).value.toLowerCase();
-            
             let filtered = allCustomers.filter(c => tab === 'chot' ? c.status === 'chot' : (c.type === tab && c.status !== 'chot'));
             if(search) filtered = filtered.filter(c => (c.name+c.phone+c.car).toLowerCase().includes(search));
 
-            const now = Date.now();
             let html = "";
             filtered.reverse().forEach(cus => {
                 const limit = cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14);
-                const isUrgent = (tab !== 'chot') && (now - (cus.last_checked || cus.created_at) > limit * 86400000);
+                const isUrgent = (tab !== 'chot') && (Date.now() - (cus.last_checked || cus.created_at) > limit * 86400000);
                 const cleanPhone = cus.phone ? String(cus.phone).replace(/\D/g,'') : '';
-
                 html += `
                 <div class="card ${isUrgent ? 'urgent' : ''}">
-                    ${isUrgent ? `<div class="urgent-badge">🚨 QUÁ ${limit} NGÀY</div>` : ''}
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <strong style="font-size:16px; color: var(--primary);">${cus.name}</strong>
                         <span class="tag tag-${cus.tag || 'nguoi'}">${cus.tag === 'nong' ? '🔥 NÓNG' : (cus.tag === 'am' ? '⚡ ẤM' : '❄️ NGUỘI')}</span>
                     </div>
                     <div class="cus-info">
-                        <p>📞 SĐT: <strong>${cus.phone}</strong> 
-                           <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a>
-                        </p>
+                        <p>📞 SĐT: <strong>${cus.phone}</strong> <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></p>
                         <p>🚗 Xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
                         <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
                         <p>📝 Ghi chú: ${cus.details}</p>
                     </div>`;
-
-                if(cus.images && Array.isArray(cus.images) && cus.images.length > 0) {
+                if(cus.images && Array.isArray(cus.images)) {
                     html += `<div class="image-grid">`;
                     cus.images.forEach(img => html += `<div class="image-item"><img src="${img}" onclick="window.open('${img}')"></div>`);
                     html += `</div>`;
                 }
-
                 html += `
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
                         ${cus.status !== 'chot' ? `
@@ -478,12 +414,11 @@
         function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
         function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
 
-        // --- BOT SĂN TIN (CẬP NHẬT TÁCH 2 LINK FB VÀ CHỢ TỐT) ---
+        // --- BOT SĂN TIN (XỬ LÝ CHIA LINK VÀ GIAO DIỆN MỚI) ---
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()){
                 const d = snap.val();
-                document.getElementById('hunt-fb').value = d.fb || "";
-                document.getElementById('hunt-chotot').value = d.chotot || "";
+                document.getElementById('hunt-groups').value = d.groups || "";
                 document.getElementById('hunt-keywords').value = d.keywords || "";
                 document.getElementById('hunt-interval').value = d.interval || 10;
             }
@@ -491,31 +426,26 @@
 
         function saveBotSettings() {
             db.ref('config_bot').set({
-                fb: document.getElementById('hunt-fb').value,
-                chotot: document.getElementById('hunt-chotot').value,
+                groups: document.getElementById('hunt-groups').value,
                 keywords: document.getElementById('hunt-keywords').value,
                 interval: document.getElementById('hunt-interval').value
             });
             alert("Đã cập nhật lệnh Bot!");
         }
 
-        // --- ĐÃ ĐỔI THÀNH LIMIT 100 VÀ GIAO DIỆN COMPACT ---
         db.ref('san_tin').limitToLast(100).on('value', snap => {
-            const div = document.getElementById('list-hunted'); div.innerHTML = "";
-            let items = []; 
+            const divFb = document.getElementById('list-hunted-fb');
+            const divCt = document.getElementById('list-hunted-chotot');
+            divFb.innerHTML = ""; divCt.innerHTML = "";
             
-            snap.forEach(c => {
-                let val = c.val();
-                val.id = c.key; 
-                items.push(val);
-            });
+            let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; items.push(v); });
             
             items.reverse().forEach(item => {
-                const readClass = item.isRead ? 'read' : '';
-                const borderColor = item.isRead ? 'var(--border)' : 'var(--accent)';
+                const isRead = item.isRead ? 'read' : '';
+                const accentColor = item.link?.includes('facebook.com') ? '#1877F2' : '#f59e0b';
                 
-                div.innerHTML += `
-                <div class="card card-hunted-compact ${readClass}" id="hunt-${item.id}" style="border-left:4px solid ${borderColor}">
+                const cardHtml = `
+                <div class="card card-hunted-compact ${isRead}" id="hunt-${item.id}" style="border-left:4px solid ${item.isRead ? 'var(--border)' : accentColor}">
                     <div class="hunted-text-box">
                         <p>${item.content || 'Không có nội dung'}</p>
                     </div>
@@ -525,19 +455,20 @@
                         <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.id}')">🗑️</button>
                     </div>
                 </div>`;
+
+                // Tự động phân loại link
+                if (item.link?.includes('chotot.com')) {
+                    divCt.innerHTML += cardHtml;
+                } else {
+                    divFb.innerHTML += cardHtml;
+                }
             });
+            if(divFb.innerHTML === "") divFb.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có tin FB.</p>";
+            if(divCt.innerHTML === "") divCt.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có tin Chợ Tốt.</p>";
         });
 
-        // Hàm hỗ trợ cho Bot Săn Tin
-        function markHuntedRead(id) {
-            db.ref('san_tin/' + id).update({ isRead: true });
-        }
-        
-        function deleteHunted(id) {
-            if(confirm("Bạn có chắc chắn muốn xóa tin này không?")) {
-                db.ref('san_tin/' + id).remove();
-            }
-        }
+        function markHuntedRead(id) { db.ref('san_tin/' + id).update({ isRead: true }); }
+        function deleteHunted(id) { if(confirm("Xóa tin này?")) db.ref('san_tin/' + id).remove(); }
     </script>
 </body>
 </html>
