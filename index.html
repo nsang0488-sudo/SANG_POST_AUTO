@@ -133,7 +133,6 @@
         .zalo-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px; vertical-align: middle; box-shadow: 0 2px 5px rgba(0, 104, 255, 0.3);}
         .zalo-icon img { width: 14px; height: 14px; }
 
-        /* Style riêng cho trạng thái Đã Xem của Bot */
         .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
 
         /* --- BỔ SUNG: Giao diện thẻ săn tin siêu gọn --- */
@@ -169,6 +168,24 @@
             font-size: 11px !important;
             width: auto !important;
             border-radius: 8px !important;
+        }
+
+        /* --- BỔ SUNG: Layout gọn cho Cấu hình Săn tin --- */
+        .hunt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 5px;
+        }
+        .hunt-grid .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .hunt-grid textarea {
+            height: 70px;
+            padding: 12px;
+            margin-bottom: 0;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -257,15 +274,32 @@
 
             <div id="tab-hunt" class="tab-content">
                 <h2 class="section-title">Cấu hình Bot săn tin</h2>
-                <div class="card">
-                    <label>ID Group Facebook</label>
-                    <textarea id="hunt-groups" rows="3"></textarea>
-                    <label>Từ khóa lọc</label>
-                    <input type="text" id="hunt-keywords">
-                    <label>Thời gian nghỉ (Phút)</label>
-                    <input type="number" id="hunt-interval" value="10">
-                    <button class="btn btn-main" style="background: var(--purple-gradient)" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
+                <div class="card" style="padding-bottom: 15px;">
+                    <div class="hunt-grid">
+                        <div class="input-group">
+                            <label>Nhóm Facebook</label>
+                            <textarea id="hunt-fb" placeholder="Link hoặc ID..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Trang Chợ Tốt</label>
+                            <textarea id="hunt-chotot" placeholder="Link chuyên mục..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="hunt-grid" style="margin-top: 10px;">
+                        <div class="input-group">
+                            <label>Từ khóa lọc</label>
+                            <input type="text" id="hunt-keywords" placeholder="VD: vios, cx5..." style="margin-bottom:0; padding: 12px; font-size:13px;">
+                        </div>
+                        <div class="input-group">
+                            <label>Quét lại sau (Phút)</label>
+                            <input type="number" id="hunt-interval" value="10" style="margin-bottom:0; padding: 12px; font-size:13px;">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-main" style="background: var(--purple-gradient); margin-top: 15px;" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
                 </div>
+                
                 <h2 class="section-title">Tin mới săn được</h2>
                 <div id="list-hunted"></div>
             </div>
@@ -444,11 +478,12 @@
         function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
         function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
 
-        // --- BOT SĂN TIN (CẬP NHẬT CHỨC NĂNG ĐÃ XEM / XOÁ) ---
+        // --- BOT SĂN TIN (CẬP NHẬT TÁCH 2 LINK FB VÀ CHỢ TỐT) ---
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()){
                 const d = snap.val();
-                document.getElementById('hunt-groups').value = d.groups || "";
+                document.getElementById('hunt-fb').value = d.fb || "";
+                document.getElementById('hunt-chotot').value = d.chotot || "";
                 document.getElementById('hunt-keywords').value = d.keywords || "";
                 document.getElementById('hunt-interval').value = d.interval || 10;
             }
@@ -456,7 +491,8 @@
 
         function saveBotSettings() {
             db.ref('config_bot').set({
-                groups: document.getElementById('hunt-groups').value,
+                fb: document.getElementById('hunt-fb').value,
+                chotot: document.getElementById('hunt-chotot').value,
                 keywords: document.getElementById('hunt-keywords').value,
                 interval: document.getElementById('hunt-interval').value
             });
