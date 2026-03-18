@@ -1,603 +1,541 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANG AUTO PRO - PREMIUM CRM</title>
-    <link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANG AUTO PRO - PREMIUM CRM</title>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
+<link rel="apple-touch-icon" href="https://i.ibb.co/Z6f1Nb9H/image.png">
 
-    <style>
-        /* --- GIỮ NGUYÊN CSS CỦA BẠN --- */
-        :root {
-            --primary: #2563eb;
-            --accent: #0ea5e9;
-            --accent-gradient: linear-gradient(135deg, #0ea5e9, #3b82f6);
-            --gold-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
-            --green-gradient: linear-gradient(135deg, #34d399, #10b981);
-            --purple-gradient: linear-gradient(135deg, #c084fc, #9333ea);
-            --bg: #f0f4f8; 
-            --card: #ffffff; 
-            --border: #e2e8f0;
-            --text-main: #1e293b; 
-            --text-dim: #64748b; 
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.min.js"></script>
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: var(--bg); color: var(--text-main); 
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0; padding-bottom: 90px;
-        }
+<style>
 
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(240, 244, 248, 0.85); backdrop-filter: blur(15px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999; transition: opacity 0.4s ease;
-        }
-        .login-box {
-            background: var(--card); padding: 40px 30px; border-radius: 24px;
-            border: 1px solid var(--border); width: 90%; max-width: 360px;
-            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            animation: fadeIn 0.5s ease;
-        }
-        .login-box h2 { margin: 0 0 10px 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; font-weight: 900; }
-        .login-box p { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; font-weight: 600; }
-        .login-box input { text-align: center; font-size: 18px; letter-spacing: 5px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 2px solid var(--border);}
-        .login-box input:focus { border-color: var(--primary); }
+:root{
+--primary:#2563eb;
+--accent:#0ea5e9;
+--accent-gradient:linear-gradient(135deg,#0ea5e9,#3b82f6);
+--gold-gradient:linear-gradient(135deg,#fbbf24,#f59e0b);
+--green-gradient:linear-gradient(135deg,#34d399,#10b981);
+--purple-gradient:linear-gradient(135deg,#c084fc,#9333ea);
+--bg:#f0f4f8;
+--card:#ffffff;
+--border:#e2e8f0;
+--text-main:#1e293b;
+--text-dim:#64748b;
+--danger:#ef4444;
+--warning:#f59e0b;
+--success:#10b981;
+}
 
-        #app-content { display: none; }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-        .header {
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
-            padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .header h1 { font-size: 19px; letter-spacing: 5px; font-weight: 900; margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header span { color: var(--text-dim); font-size: 10px; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700;}
+body{
+background:var(--bg);
+color:var(--text-main);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
+margin:0;
+padding-bottom:90px
+}
 
-        .container { max-width: 600px; margin: auto; padding: 15px; }
+.card.urgent{
+border-left:4px solid #ef4444;
+background:#fff5f5
+}
 
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+#login-screen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(240,244,248,.9);
+backdrop-filter:blur(15px);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999
+}
 
-        .section-title { font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin: 25px 0 10px 5px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;}
-        .section-title::before { content: ""; display: block; width: 4px; height: 14px; background: var(--primary); border-radius: 4px; }
-        
-        .card { 
-            background: var(--card); 
-            border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 15px; 
-            position: relative; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-        
-        label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-        input, textarea, select {
-            width: 100%; background: #f8fafc; border: 1px solid var(--border);
-            color: var(--text-main); padding: 15px; border-radius: 12px; font-size: 14px; margin-bottom: 18px;
-            transition: all 0.3s; font-weight: 500;
-        }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15); background: #ffffff;}
-        
-        .search-bar { background: #ffffff; border-radius: 20px; padding: 14px 20px; border: 1px solid var(--border); margin-bottom: 20px; font-size: 14px; width: 100%; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.02);}
+.login-box{
+background:white;
+padding:40px 30px;
+border-radius:20px;
+border:1px solid var(--border);
+width:90%;
+max-width:360px;
+text-align:center
+}
 
-        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .image-item { aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; background: #e2e8f0; border: 1px solid var(--border); position: relative; }
-        .image-item img { width: 100%; height: 100%; object-fit: cover; }
+.login-box h2{
+margin:0 0 10px 0;
+background:var(--accent-gradient);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent
+}
 
-        .btn { 
-            width: 100%; padding: 14px; border: none; border-radius: 12px; 
-            font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; 
-            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; letter-spacing: 0.5px;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-main { background: var(--accent-gradient); color: #fff; font-size: 14px; padding: 16px; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
-        .btn-check { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
-        .btn-success { background: var(--green-gradient); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
-        .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+.login-box input{
+text-align:center;
+font-size:18px;
+letter-spacing:5px;
+background:#f8fafc;
+border:2px solid var(--border)
+}
 
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px); border-top: 1px solid var(--border);
-            display: flex; height: 85px; padding-bottom: 20px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-        }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-dim); font-size: 9px; font-weight: 800; text-decoration: none; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; margin-bottom: 5px; }
+.header{
+background:white;
+padding:20px;
+text-align:center;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:0;
+z-index:100
+}
 
-        .tag { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block; }
-        .tag-nong { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca;}
-        .tag-am { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a;}
-        .tag-nguoi { background: #f0f9ff; color: var(--primary); border: 1px solid #bae6fd;}
+.header h1{
+font-size:18px;
+margin:0;
+background:var(--accent-gradient);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent
+}
 
-        #toast { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--success); color: #fff; padding: 14px 28px; border-radius: 30px; font-weight: 800; display: none; z-index: 1000; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);}
-        
-        .cus-info { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border);}
-        .cus-info p { margin: 6px 0; font-size: 13px; color: var(--text-dim); }
-        .cus-info strong { color: var(--text-main); }
-        .zalo-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #0068ff; border-radius: 5px; margin-left: 8px; vertical-align: middle; box-shadow: 0 2px 5px rgba(0, 104, 255, 0.3);}
-        .zalo-icon img { width: 14px; height: 14px; }
+.container{
+max-width:600px;
+margin:auto;
+padding:15px
+}
 
-        .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
+.tab-content{
+display:none
+}
 
-        .hunt-category-title {
-            font-size: 11px; font-weight: 900; color: #64748b; 
-            margin: 20px 0 10px 5px; display: flex; align-items: center; gap: 6px;
-        }
-        .hunt-category-title.fb { color: #1877F2; }
+.tab-content.active{
+display:block
+}
 
-        .card-hunted-compact {
-            padding: 10px 12px !important; margin-bottom: 8px !important;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; border-radius: 12px !important;
-        }
-        .hunted-text-box { flex: 1; overflow: hidden; }
-        .hunted-text-box p {
-            margin: 0; font-size: 13px; white-space: nowrap; 
-            overflow: hidden; text-overflow: ellipsis; 
-            color: var(--text-main); font-weight: 500;
-        }
-        .hunted-btns-compact { display: flex; gap: 5px; flex-shrink: 0; }
-        .btn-mini { padding: 6px 10px !important; font-size: 11px !important; width: auto !important; border-radius: 8px !important; }
+.section-title{
+font-size:12px;
+font-weight:800;
+color:var(--primary);
+margin:25px 0 10px 5px
+}
 
-        /* CSS Biểu đồ Định giá */
-        .price-bar-container { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
-        .price-label { width: 60px; text-align: right; color: var(--text-main); }
-        .price-track { flex: 1; background: #e2e8f0; border-radius: 10px; height: 22px; overflow: hidden; position: relative; }
-        .price-fill { background: var(--accent-gradient); height: 100%; border-radius: 10px; transition: width 0.5s ease; min-width: 5%; }
-        .price-count { width: 50px; color: var(--text-dim); font-size: 11px; text-align: left; }
-    </style>
+.card{
+background:white;
+border:1px solid var(--border);
+border-radius:16px;
+padding:18px;
+margin-bottom:15px
+}
+
+input,textarea,select{
+width:100%;
+background:#f8fafc;
+border:1px solid var(--border);
+padding:14px;
+border-radius:10px;
+margin-bottom:15px
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+font-weight:700;
+cursor:pointer
+}
+
+.btn-main{
+background:var(--accent-gradient);
+color:white
+}
+
+.btn-check{
+background:#f0f9ff;
+color:#0284c7;
+border:1px solid #bae6fd
+}
+
+.btn-success{
+background:var(--green-gradient);
+color:white
+}
+
+.btn-danger{
+background:#fef2f2;
+color:var(--danger);
+border:1px solid #fecaca
+}
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+border-top:1px solid var(--border);
+display:flex;
+height:80px
+}
+
+.nav-item{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+font-size:10px;
+color:#64748b;
+text-decoration:none
+}
+
+.nav-item.active{
+color:var(--primary)
+}
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px
+}
+
+.image-item{
+aspect-ratio:1/1;
+border-radius:8px;
+overflow:hidden
+}
+
+.image-item img{
+width:100%;
+height:100%;
+object-fit:cover
+}
+
+#toast{
+position:fixed;
+top:80px;
+left:50%;
+transform:translateX(-50%);
+background:var(--success);
+color:white;
+padding:12px 24px;
+border-radius:20px;
+font-weight:700;
+display:none;
+z-index:999
+}
+
+</style>
 </head>
+
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>HỆ THỐNG BẢO MẬT</h2>
-            <p>SANG AUTO PRO CRM</p>
-            <input type="password" id="access-key" placeholder="••••••">
-            <button class="btn btn-main" style="margin-top: 10px;" onclick="verifyAccess()">MỞ KHÓA DỮ LIỆU</button>
-        </div>
-    </div>
+<div id="login-screen">
+<div class="login-box">
+<h2>SANG AUTO PRO</h2>
+<p>Hệ thống CRM</p>
+<input type="password" id="access-key">
+<button class="btn btn-main" onclick="verifyAccess()">MỞ KHÓA</button>
+</div>
+</div>
 
-    <div id="app-content">
-        <div id="toast">Thành công!</div>
-        <div class="header"><h1>SANG AUTO PRO</h1><span>PREMIUM CRM SYSTEM</span></div>
+<div id="app-content" style="display:none">
 
-        <div class="container">
-            <div id="tab-input" class="tab-content active">
-                <h2 class="section-title">Phân loại dữ liệu</h2>
-                <div class="card">
-                    <select id="form-type" onchange="toggleFormFields()">
-                        <option value="mua">🛒 KHÁCH CẦN MUA XE</option>
-                        <option value="ban">🚗 KHÁCH CẦN BÁN XE</option>
-                    </select>
-                </div>
-                <h2 class="section-title">Thông tin cơ bản</h2>
-                <div class="card">
-                    <label>Tên khách hàng</label>
-                    <input type="text" id="cus-name" placeholder="VD: Anh Tuấn">
-                    <label>Số điện thoại</label>
-                    <input type="tel" id="cus-phone" placeholder="09xxxxxxxxx">
-                    <label>Loại xe <span id="lbl-xe">khách cần</span></label>
-                    <input type="text" id="cus-car" placeholder="VD: Mazda 3, CX5...">
-                    <label>Đời xe, màu xe</label>
-                    <input type="text" id="cus-year-color" placeholder="VD: 2022, Trắng">
+<div id="toast">Đã lưu</div>
 
-                    <div id="field-finance-mua">
-                        <label>Tài chính</label>
-                        <input type="text" id="cus-finance-mua" placeholder="VD: 500tr mặt">
-                    </div>
-                    <div id="field-finance-ban" style="display: none;">
-                        <label>Tình trạng tài chính xe</label>
-                        <select id="cus-finance-ban">
-                            <option value="Không vay">Không vay (Pháp lý chuẩn)</option>
-                            <option value="Đang vay">Đang vay Ngân hàng</option>
-                        </select>
-                    </div>
+<div class="header">
+<h1>SANG AUTO PRO CRM</h1>
+</div>
 
-                    <label>Phân loại khách</label>
-                    <select id="cus-tag">
-                        <option value="nong">🔥 NÓNG (2 ngày)</option>
-                        <option value="am">⚡ ẤM (7 ngày)</option>
-                        <option value="nguoi">❄️ NGUỘI (14 ngày)</option>
-                    </select>
+<div class="container">
 
-                    <label id="lbl-detail">Ghi chú yêu cầu</label>
-                    <textarea id="cus-detail" style="height: 100px;"></textarea>
+<div id="tab-input" class="tab-content active">
 
-                    <div id="field-images" style="display: none;">
-                        <label>Hình ảnh xe thực tế</label>
-                        <input type="file" id="cus-images" accept="image/*" multiple onchange="handleImagePreview(this)">
-                        <div class="image-grid" id="preview-grid"></div>
-                    </div>
+<h2 class="section-title">Thông tin khách</h2>
 
-                    <button class="btn btn-main" id="btn-save" onclick="saveCustomer()">💾 LƯU DỮ LIỆU KHÁCH</button>
-                </div>
-            </div>
+<div class="card">
 
-            <div id="tab-buyers" class="tab-content">
-                <input type="text" class="search-bar" id="search-buyer" placeholder="🔍 Tìm khách mua..." oninput="renderList('mua')">
-                <div id="list-buyers"></div>
-            </div>
+<select id="form-type" onchange="toggleFormFields()">
+<option value="mua">Khách cần mua xe</option>
+<option value="ban">Khách cần bán xe</option>
+</select>
 
-            <div id="tab-sellers" class="tab-content">
-                <input type="text" class="search-bar" id="search-seller" placeholder="🔍 Tìm khách bán..." oninput="renderList('ban')">
-                <div id="list-sellers"></div>
-            </div>
+<input id="cus-name" placeholder="Tên khách">
 
-            <div id="tab-closed" class="tab-content">
-                <input type="text" class="search-bar" id="search-closed" placeholder="🔍 Tìm đã chốt..." oninput="renderList('chot')">
-                <div id="list-closed"></div>
-            </div>
+<input id="cus-phone" placeholder="SĐT">
 
-            <div id="tab-hunt" class="tab-content">
-                <h2 class="section-title">Cấu hình Bot săn tin</h2>
-                <div class="card">
-                    <label>ID Group Facebook</label>
-                    <textarea id="hunt-groups" rows="3"></textarea>
-                    <label>Từ khóa lọc</label>
-                    <input type="text" id="hunt-keywords">
-                    <label>Thời gian nghỉ (Phút)</label>
-                    <input type="number" id="hunt-interval" value="10">
-                    <button class="btn btn-main" style="background: var(--purple-gradient)" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
-                </div>
+<input id="cus-car" placeholder="Loại xe">
 
-                <h2 class="section-title">Dữ liệu săn được</h2>
-                <div class="hunt-category-title fb">🔵 FACEBOOK MARKET</div>
-                <div id="list-hunted-fb"></div>
-            </div>
+<input id="cus-year-color" placeholder="Đời xe / màu">
 
-            <div id="tab-price" class="tab-content">
-                <h2 class="section-title">Hệ thống phân tích giá</h2>
-                <div class="card">
-                    <p style="font-size:12px; color:var(--text-dim); margin-top:0;">Hệ thống sẽ ra lệnh cho Bot tự động quét và thống kê thanh khoản trên Chợ Tốt.</p>
-                    
-                    <label>Tên dòng xe</label>
-                    <input type="text" id="price-name" placeholder="VD: Xpander, Vios, CX5...">
-                    
-                    <label>Đời xe (Năm SX)</label>
-                    <input type="number" id="price-year" placeholder="VD: 2021">
-                    
-                    <label>Màu xe (Không bắt buộc)</label>
-                    <input type="text" id="price-color" placeholder="VD: Trắng">
+<div id="field-finance-mua">
+<input id="cus-finance-mua" placeholder="Tài chính">
+</div>
 
-                    <label>Số KM đã đi (ODO)</label>
-                    <input type="number" id="price-odo" placeholder="VD: 30000">
+<div id="field-finance-ban" style="display:none">
+<select id="cus-finance-ban">
+<option>Không vay</option>
+<option>Đang vay</option>
+</select>
+</div>
 
-                    <label>Loại hộp số</label>
-                    <select id="price-transmission">
-                        <option value="Tất cả">Tất cả</option>
-                        <option value="Số tự động">Số tự động (AT)</option>
-                        <option value="Số sàn">Số sàn (MT)</option>
-                    </select>
+<select id="cus-tag">
+<option value="nong">Nóng</option>
+<option value="am">Ấm</option>
+<option value="nguoi">Nguội</option>
+</select>
 
-                    <button class="btn btn-main" id="btn-price" onclick="requestPriceCheck()" style="background: var(--gold-gradient); color: #fff;">🎯 BẤM GIÁ (GỌI BOT)</button>
-                </div>
+<textarea id="cus-detail" placeholder="Ghi chú"></textarea>
 
-                <div class="card" id="price-result-card" style="display: none;">
-                    <h2 class="section-title" style="margin-top:0;">📊 Kết quả thanh khoản</h2>
-                    <div id="price-results-content"></div>
-                </div>
-            </div>
-        </div>
+<div id="field-images" style="display:none">
+<input type="file" id="cus-images" multiple onchange="handleImagePreview(this)">
+<div class="image-grid" id="preview-grid"></div>
+</div>
 
-        <div class="bottom-nav">
-            <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('input', this)"><span class="nav-icon">📝</span><span>NHẬP</span></a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('buyers', this)"><span class="nav-icon">🛒</span><span>MUA</span></a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)"><span class="nav-icon">🚗</span><span>BÁN</span></a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)"><span class="nav-icon">🏆</span><span>CHỐT</span></a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hunt', this)"><span class="nav-icon">🎯</span><span>SĂN</span></a>
-            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('price', this)"><span class="nav-icon">📊</span><span>GIÁ</span></a>
-        </div>
-    </div> 
+<button class="btn btn-main" id="btn-save" onclick="saveCustomer()">LƯU KHÁCH</button>
 
-    <script>
-        // --- FIREBASE CONFIG ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
-            databaseURL: "https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "sang-post-auto"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
+</div>
 
-        function verifyAccess() {
-            if (document.getElementById('access-key').value === '190525') {
-                sessionStorage.setItem('crm_unlocked', 'true');
-                location.reload();
-            } else { alert('Sai mã!'); }
-        }
+</div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            if (sessionStorage.getItem('crm_unlocked') === 'true') {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-content').style.display = 'block';
-            }
-        });
+<div id="tab-buyers" class="tab-content">
+<input id="search-buyer" oninput="renderList('mua')" placeholder="Tìm khách mua">
+<div id="list-buyers"></div>
+</div>
 
-        let allCustomers = [];
+<div id="tab-sellers" class="tab-content">
+<input id="search-seller" oninput="renderList('ban')" placeholder="Tìm khách bán">
+<div id="list-sellers"></div>
+</div>
 
-        function switchTab(id, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            el.classList.add('active');
-        }
+<div id="tab-closed" class="tab-content">
+<input id="search-closed" oninput="renderList('chot')" placeholder="Tìm khách đã chốt">
+<div id="list-closed"></div>
+</div>
 
-        function toggleFormFields() {
-            const isMua = document.getElementById('form-type').value === 'mua';
-            document.getElementById('lbl-xe').innerText = isMua ? "khách cần" : "khách bán";
-            document.getElementById('field-finance-mua').style.display = isMua ? "block" : "none";
-            document.getElementById('field-finance-ban').style.display = isMua ? "none" : "block";
-            document.getElementById('field-images').style.display = isMua ? "none" : "block";
-        }
+</div>
 
-        function handleImagePreview(input) {
-            const grid = document.getElementById('preview-grid'); grid.innerHTML = "";
-            if (input.files) {
-                Array.from(input.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => grid.innerHTML += `<div class="image-item"><img src="${e.target.result}"></div>`;
-                    reader.readAsDataURL(file);
-                });
-            }
-        }
+<div class="bottom-nav">
 
-        async function uploadImages(files) {
-            const urls = [];
-            for (let file of files) {
-                try {
-                    const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1024 });
-                    const fd = new FormData(); fd.append("image", compressed);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-                    const data = await res.json();
-                    if(data.success) urls.push(data.data.url);
-                } catch (e) { console.error(e); }
-            }
-            return urls;
-        }
+<a class="nav-item active" onclick="switchTab('input',this)">NHẬP</a>
+<a class="nav-item" onclick="switchTab('buyers',this)">MUA</a>
+<a class="nav-item" onclick="switchTab('sellers',this)">BÁN</a>
+<a class="nav-item" onclick="switchTab('closed',this)">CHỐT</a>
 
-        async function saveCustomer() {
-            const name = document.getElementById('cus-name').value.trim();
-            const phone = document.getElementById('cus-phone').value.trim();
-            if(!name || !phone) return alert("Nhập Tên và SĐT!");
+</div>
 
-            const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerHTML = "⏳ ĐANG LƯU...";
+</div>
 
-            const type = document.getElementById('form-type').value;
-            let imgs = [];
-            if(type === 'ban') imgs = await uploadImages(document.getElementById('cus-images').files);
+<script>
 
-            const newId = 'cus_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            
-            const data = {
-                id: newId, type: type, status: 'active', name: name, phone: phone,
-                car: document.getElementById('cus-car').value,
-                year_color: document.getElementById('cus-year-color').value,
-                finance: type === 'mua' ? document.getElementById('cus-finance-mua').value : document.getElementById('cus-finance-ban').value,
-                tag: document.getElementById('cus-tag').value,
-                details: document.getElementById('cus-detail').value,
-                images: imgs, created_at: Date.now(), last_checked: Date.now()
-            };
+const firebaseConfig={
+apiKey:"AIzaSyBVz4zVh8gxmNS4vbx39t0mVP7ZJJqH9T8",
+databaseURL:"https://sang-post-auto-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"sang-post-auto"
+}
 
-            await db.ref('crm_customers/' + newId).set(data);
-            alert("Đã lưu!"); location.reload();
-        }
+firebase.initializeApp(firebaseConfig)
+const db=firebase.database()
 
-        db.ref('crm_customers').on('value', snap => {
-            allCustomers = [];
-            snap.forEach(c => {
-                let val = c.val();
-                if(!val.id) val.id = c.key;
-                allCustomers.push(val);
-            });
-            renderList('mua'); renderList('ban'); renderList('chot');
-        });
+const IMGBB_KEY="a4b55574ff83037588382d5f83783ea1"
 
-        function renderList(tab) {
-            const container = document.getElementById(tab === 'mua' ? 'list-buyers' : (tab === 'ban' ? 'list-sellers' : 'list-closed'));
-            const search = document.getElementById(tab === 'mua' ? 'search-buyer' : (tab === 'ban' ? 'search-seller' : 'search-closed')).value.toLowerCase();
-            let filtered = allCustomers.filter(c => tab === 'chot' ? c.status === 'chot' : (c.type === tab && c.status !== 'chot'));
-            if(search) filtered = filtered.filter(c => (c.name+c.phone+c.car).toLowerCase().includes(search));
+function verifyAccess(){
+if(document.getElementById("access-key").value==="190525"){
+sessionStorage.setItem("crm_unlocked","true")
+location.reload()
+}else{
+alert("Sai mã")
+}
+}
 
-            let html = "";
-            filtered.reverse().forEach(cus => {
-                const limit = cus.tag === 'nong' ? 2 : (cus.tag === 'am' ? 7 : 14);
-                const isUrgent = (tab !== 'chot') && (Date.now() - (cus.last_checked || cus.created_at) > limit * 86400000);
-                const cleanPhone = cus.phone ? String(cus.phone).replace(/\D/g,'') : '';
-                html += `
-                <div class="card ${isUrgent ? 'urgent' : ''}">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <strong style="font-size:16px; color: var(--primary);">${cus.name}</strong>
-                        <span class="tag tag-${cus.tag || 'nguoi'}">${cus.tag === 'nong' ? '🔥 NÓNG' : (cus.tag === 'am' ? '⚡ ẤM' : '❄️ NGUỘI')}</span>
-                    </div>
-                    <div class="cus-info">
-                        <p>📞 SĐT: <strong>${cus.phone}</strong> <a href="https://zalo.me/${cleanPhone}" target="_blank" class="zalo-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"></a></p>
-                        <p>🚗 Xe: <strong>${cus.car}</strong> (${cus.year_color})</p>
-                        <p>💰 Tài chính: <strong>${cus.finance}</strong></p>
-                        <p>📝 Ghi chú: ${cus.details}</p>
-                    </div>`;
-                if(cus.images && Array.isArray(cus.images)) {
-                    html += `<div class="image-grid">`;
-                    cus.images.forEach(img => html += `<div class="image-item"><img src="${img}" onclick="window.open('${img}')"></div>`);
-                    html += `</div>`;
-                }
-                html += `
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:10px;">
-                        ${cus.status !== 'chot' ? `
-                            <button class="btn btn-check" onclick="markChecked('${cus.id}')">📞 ĐÃ LIÊN HỆ</button>
-                            <button class="btn btn-success" onclick="markClosed('${cus.id}')">🏆 CHỐT</button>
-                        ` : ''}
-                        <button class="btn btn-danger" style="grid-column: span ${cus.status === 'chot' ? 2 : 1}" onclick="deleteCus('${cus.id}')">🗑️ XÓA</button>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html || "<p style='text-align:center;color:#666;'>Trống.</p>";
-        }
+document.addEventListener("DOMContentLoaded",()=>{
+if(sessionStorage.getItem("crm_unlocked")){
+document.getElementById("login-screen").style.display="none"
+document.getElementById("app-content").style.display="block"
+}
+})
 
-        function markChecked(id) { db.ref('crm_customers/' + id).update({ last_checked: Date.now() }); }
-        function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
-        function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
+function showToast(msg){
+const t=document.getElementById("toast")
+t.innerText=msg
+t.style.display="block"
+setTimeout(()=>t.style.display="none",2000)
+}
 
-        // --- PHẦN BOT SĂN TIN FACEBOOK ---
-        db.ref('config_bot').on('value', snap => {
-            if(snap.exists()){
-                const d = snap.val();
-                document.getElementById('hunt-groups').value = d.groups || "";
-                document.getElementById('hunt-keywords').value = d.keywords || "";
-                document.getElementById('hunt-interval').value = d.interval || 10;
-            }
-        });
+let allCustomers=[]
 
-        function saveBotSettings() {
-            db.ref('config_bot').set({
-                groups: document.getElementById('hunt-groups').value,
-                keywords: document.getElementById('hunt-keywords').value,
-                interval: document.getElementById('hunt-interval').value
-            });
-            alert("Đã cập nhật lệnh Bot!");
-        }
+function switchTab(id,el){
+document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"))
+document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"))
+document.getElementById("tab-"+id).classList.add("active")
+el.classList.add("active")
+}
 
-        function renderHuntedData() {
-            const divFb = document.getElementById('list-hunted-fb');
-            divFb.innerHTML = "";
+function toggleFormFields(){
+const isMua=document.getElementById("form-type").value==="mua"
+document.getElementById("field-finance-mua").style.display=isMua?"block":"none"
+document.getElementById("field-finance-ban").style.display=isMua?"none":"block"
+document.getElementById("field-images").style.display=isMua?"none":"block"
+}
 
-            // Chỉ lắng nghe nhánh FACEBOOK (san_tin), đã bỏ chợ tốt
-            db.ref('san_tin').limitToLast(50).on('value', snap => {
-                let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; v.path = 'san_tin'; items.push(v); });
-                renderToBox(items.reverse(), divFb, '#1877F2');
-            });
-        }
+function handleImagePreview(input){
+const grid=document.getElementById("preview-grid")
+grid.innerHTML=""
+Array.from(input.files).forEach(file=>{
+const r=new FileReader()
+r.onload=e=>{
+grid.innerHTML+=`<div class="image-item"><img src="${e.target.result}"></div>`
+}
+r.readAsDataURL(file)
+})
+}
 
-        function renderToBox(items, container, color) {
-            if (items.length === 0) {
-                container.innerHTML = "<p style='font-size:11px; color:#999; margin-left:10px;'>Chưa có dữ liệu.</p>";
-                return;
-            }
-            let html = "";
-            items.forEach(item => {
-                const isRead = item.isRead ? 'read' : '';
-                const title = item.title || "";
-                const phone = item.phone ? ` - 📞 ${item.phone}` : "";
-                const keyword = item.keyword ? ` [Từ khóa: ${item.keyword}]` : "";
-                const contentText = item.content || (title + keyword) || "Bấm xem để biết chi tiết";
+async function uploadImages(files){
 
-                html += `
-                <div class="card card-hunted-compact ${isRead}" id="hunt-${item.id}" style="border-left:4px solid ${item.isRead ? 'var(--border)' : color}">
-                    <div class="hunted-text-box">
-                        <p>${contentText}${phone}</p>
-                    </div>
-                    <div class="hunted-btns-compact">
-                        <a href="${item.link}" target="_blank" class="btn btn-check btn-mini">🌍 XEM</a>
-                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.path}', '${item.id}')">✔️</button>
-                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.path}', '${item.id}')">🗑️</button>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
+let urls=[]
 
-        function markHuntedRead(path, id) { db.ref(path + '/' + id).update({ isRead: true }); }
-        function deleteHunted(path, id) { if(confirm("Xóa tin này?")) db.ref(path + '/' + id).remove(); }
+for(let file of files){
 
-        renderHuntedData();
+const compressed=await imageCompression(file,{maxSizeMB:.5,maxWidthOrHeight:1024})
 
+let fd=new FormData()
+fd.append("image",compressed)
 
-        // --- CHỨC NĂNG MỚI: ĐỊNH GIÁ CHỢ TỐT ---
-        function requestPriceCheck() {
-            const name = document.getElementById('price-name').value.trim();
-            const year = document.getElementById('price-year').value.trim();
-            const color = document.getElementById('price-color').value.trim();
-            
-            // LẤY DỮ LIỆU MỚI THÊM
-            const odo = document.getElementById('price-odo').value.trim();
-            const transmission = document.getElementById('price-transmission').value;
+let res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`,{method:"POST",body:fd})
 
-            if(!name || !year) return alert("Vui lòng nhập Tên xe và Đời xe!");
+let data=await res.json()
 
-            const btn = document.getElementById('btn-price');
-            btn.disabled = true;
-            btn.innerHTML = "⏳ BOT ĐANG QUÉT CHỢ TỐT...";
-            document.getElementById('price-result-card').style.display = 'none';
+if(data.success) urls.push(data.data.url)
 
-            const requestRef = db.ref('dinh_gia_xe/requests');
-            const newRequest = requestRef.push();
+}
 
-            // GỬI KÈM ODO VÀ HỘP SỐ LÊN FIREBASE
-            newRequest.set({
-                name: name,
-                year: year,
-                color: color,
-                odo: odo,
-                transmission: transmission,
-                status: "pending",
-                createdAt: Date.now()
-            });
+return urls
+}
 
-            // Lắng nghe khi bot trả về
-            newRequest.on('value', (snap) => {
-                const data = snap.val();
-                if (data && data.status === 'completed') {
-                    btn.disabled = false;
-                    btn.innerHTML = "🎯 BẤM GIÁ LẠI";
-                    renderPriceChart(data.priceDistribution, data.totalFound);
-                    newRequest.off('value'); // Xong thì ngắt lắng nghe
-                } else if (data && data.status === 'error') {
-                    btn.disabled = false;
-                    btn.innerHTML = "🎯 THỬ LẠI";
-                    alert("Bot báo lỗi: " + data.message);
-                    newRequest.off('value');
-                }
-            });
-        }
+async function saveCustomer(){
 
-        function renderPriceChart(distribution, total) {
-            const card = document.getElementById('price-result-card');
-            const container = document.getElementById('price-results-content');
-            
-            if (!distribution || total === 0) {
-                container.innerHTML = "<p style='text-align:center; color:var(--danger); font-weight:bold;'>Không tìm thấy xe tương tự đang bán trên Chợ Tốt trong 2 tháng qua.</p>";
-                card.style.display = 'block';
-                return;
-            }
+const name=document.getElementById("cus-name").value.trim()
+const phone=document.getElementById("cus-phone").value.trim()
 
-            let html = `<p style="text-align:center; font-weight:900; color:var(--primary); margin-bottom:20px; font-size:14px;">🔎 TÌM THẤY ${total} XE ĐANG BÁN</p>`;
-            
-            // Lấy danh sách giá, sắp xếp tăng dần
-            const prices = Object.keys(distribution).map(Number).sort((a,b) => a-b);
-            
-            // Tìm số lượng xe cao nhất ở 1 mức giá để làm chuẩn 100% cho biểu đồ
-            const maxCount = Math.max(...Object.values(distribution));
+if(!name||!phone){
+alert("Nhập tên và SĐT")
+return
+}
 
-            prices.forEach(price => {
-                const count = distribution[price];
-                const percentage = Math.max((count / maxCount) * 100, 5); // Tối thiểu 5% để thấy màu
-                
-                html += `
-                <div class="price-bar-container">
-                    <div class="price-label">${price} tr</div>
-                    <div class="price-track">
-                        <div class="price-fill" style="width: ${percentage}%;"></div>
-                    </div>
-                    <div class="price-count">${count} xe</div>
-                </div>`;
-            });
+const type=document.getElementById("form-type").value
 
-            container.innerHTML = html;
-            card.style.display = 'block';
-            
-            // Tự động cuộn xuống kết quả
-            card.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    </script>
+let imgs=[]
+
+if(type==="ban"){
+imgs=await uploadImages(document.getElementById("cus-images").files)
+}
+
+let id="cus_"+Date.now()
+
+let data={
+id,
+type,
+status:"active",
+name,
+phone,
+car:document.getElementById("cus-car").value,
+year_color:document.getElementById("cus-year-color").value,
+finance:type==="mua"?document.getElementById("cus-finance-mua").value:document.getElementById("cus-finance-ban").value,
+tag:document.getElementById("cus-tag").value,
+details:document.getElementById("cus-detail").value,
+images:imgs,
+created_at:Date.now(),
+last_checked:Date.now()
+}
+
+await db.ref("crm_customers/"+id).set(data)
+
+showToast("Đã lưu khách")
+
+location.reload()
+
+}
+
+db.ref("crm_customers").on("value",snap=>{
+
+allCustomers=[]
+
+snap.forEach(c=>{
+let v=c.val()
+if(!v.id)v.id=c.key
+allCustomers.push(v)
+})
+
+renderList("mua")
+renderList("ban")
+renderList("chot")
+
+})
+
+function renderList(tab){
+
+let container=document.getElementById(tab==="mua"?"list-buyers":tab==="ban"?"list-sellers":"list-closed")
+
+let search=document.getElementById(tab==="mua"?"search-buyer":tab==="ban"?"search-seller":"search-closed").value.toLowerCase()
+
+let filtered=allCustomers.filter(c=>tab==="chot"?c.status==="chot":(c.type===tab&&c.status!=="chot"))
+
+if(search) filtered=filtered.filter(c=>(c.name+c.phone+c.car).toLowerCase().includes(search))
+
+let html=""
+
+filtered.reverse().forEach(cus=>{
+
+let limit=cus.tag==="nong"?2:(cus.tag==="am"?7:14)
+
+let urgent=(Date.now()-(cus.last_checked||cus.created_at)>limit*86400000)
+
+html+=`
+
+<div class="card ${urgent?"urgent":""}">
+
+<strong>${cus.name}</strong>
+
+<p>${cus.phone}</p>
+
+<p>${cus.car}</p>
+
+<button class="btn btn-check" onclick="markChecked('${cus.id}')">ĐÃ GỌI</button>
+
+<button class="btn btn-success" onclick="markClosed('${cus.id}')">CHỐT</button>
+
+<button class="btn btn-danger" onclick="deleteCus('${cus.id}')">XÓA</button>
+
+</div>
+
+`
+
+})
+
+container.innerHTML=html||"<p>Trống</p>"
+
+}
+
+function markChecked(id){
+db.ref("crm_customers/"+id).update({last_checked:Date.now()})
+}
+
+function markClosed(id){
+if(confirm("Chốt xe?")){
+db.ref("crm_customers/"+id).update({status:"chot"})
+}
+}
+
+function deleteCus(id){
+if(confirm("Xóa khách?")){
+db.ref("crm_customers/"+id).remove()
+}
+}
+
+</script>
+
 </body>
 </html>
