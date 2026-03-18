@@ -127,13 +127,11 @@
 
         .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
 
-        /* --- STYLE MỚI CHO SĂN TIN --- */
         .hunt-category-title {
             font-size: 11px; font-weight: 900; color: #64748b; 
             margin: 20px 0 10px 5px; display: flex; align-items: center; gap: 6px;
         }
         .hunt-category-title.fb { color: #1877F2; }
-        .hunt-category-title.ct { color: #f59e0b; }
 
         .card-hunted-compact {
             padding: 10px 12px !important; margin-bottom: 8px !important;
@@ -149,6 +147,12 @@
         .hunted-btns-compact { display: flex; gap: 5px; flex-shrink: 0; }
         .btn-mini { padding: 6px 10px !important; font-size: 11px !important; width: auto !important; border-radius: 8px !important; }
 
+        /* CSS Biểu đồ Định giá */
+        .price-bar-container { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+        .price-label { width: 60px; text-align: right; color: var(--text-main); }
+        .price-track { flex: 1; background: #e2e8f0; border-radius: 10px; height: 22px; overflow: hidden; position: relative; }
+        .price-fill { background: var(--accent-gradient); height: 100%; border-radius: 10px; transition: width 0.5s ease; min-width: 5%; }
+        .price-count { width: 50px; color: var(--text-dim); font-size: 11px; text-align: left; }
     </style>
 </head>
 <body>
@@ -246,12 +250,31 @@
                 </div>
 
                 <h2 class="section-title">Dữ liệu săn được</h2>
-                
                 <div class="hunt-category-title fb">🔵 FACEBOOK MARKET</div>
                 <div id="list-hunted-fb"></div>
+            </div>
 
-                <div class="hunt-category-title ct">🟠 CHỢ TỐT XE</div>
-                <div id="list-hunted-chotot"></div>
+            <div id="tab-price" class="tab-content">
+                <h2 class="section-title">Hệ thống phân tích giá</h2>
+                <div class="card">
+                    <p style="font-size:12px; color:var(--text-dim); margin-top:0;">Hệ thống sẽ ra lệnh cho Bot tự động quét và thống kê thanh khoản trên Chợ Tốt.</p>
+                    
+                    <label>Tên dòng xe</label>
+                    <input type="text" id="price-name" placeholder="VD: Xpander, Vios, CX5...">
+                    
+                    <label>Đời xe (Năm SX)</label>
+                    <input type="number" id="price-year" placeholder="VD: 2021">
+                    
+                    <label>Màu xe (Không bắt buộc)</label>
+                    <input type="text" id="price-color" placeholder="VD: Trắng">
+
+                    <button class="btn btn-main" id="btn-price" onclick="requestPriceCheck()" style="background: var(--gold-gradient); color: #fff;">🎯 BẤM GIÁ (GỌI BOT)</button>
+                </div>
+
+                <div class="card" id="price-result-card" style="display: none;">
+                    <h2 class="section-title" style="margin-top:0;">📊 Kết quả thanh khoản</h2>
+                    <div id="price-results-content"></div>
+                </div>
             </div>
         </div>
 
@@ -261,6 +284,7 @@
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)"><span class="nav-icon">🚗</span><span>BÁN</span></a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)"><span class="nav-icon">🏆</span><span>CHỐT</span></a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hunt', this)"><span class="nav-icon">🎯</span><span>SĂN</span></a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('price', this)"><span class="nav-icon">📊</span><span>GIÁ</span></a>
         </div>
     </div> 
 
@@ -414,7 +438,7 @@
         function markClosed(id) { if(confirm("Chốt xe?")) db.ref('crm_customers/' + id).update({ status: 'chot', closed_at: Date.now() }); }
         function deleteCus(id) { if(confirm("Xóa khách?")) db.ref('crm_customers/' + id).remove(); }
 
-        // --- PHẦN BOT SĂN TIN (ĐÃ SỬA LẠI ĐỂ ĐỌC ĐÚNG NHÁNH san_tin_chotot) ---
+        // --- PHẦN BOT SĂN TIN FACEBOOK ---
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()){
                 const d = snap.val();
@@ -433,24 +457,14 @@
             alert("Đã cập nhật lệnh Bot!");
         }
 
-        // Hàm render chung cho cả 2 nguồn
         function renderHuntedData() {
             const divFb = document.getElementById('list-hunted-fb');
-            const divCt = document.getElementById('list-hunted-chotot');
-            
-            // Xóa dữ liệu cũ để tránh trùng lặp khi listener gọi lại
-            divFb.innerHTML = ""; divCt.innerHTML = "";
+            divFb.innerHTML = "";
 
-            // Listener cho nhánh FACEBOOK (san_tin)
+            // Chỉ lắng nghe nhánh FACEBOOK (san_tin), đã bỏ chợ tốt
             db.ref('san_tin').limitToLast(50).on('value', snap => {
                 let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; v.path = 'san_tin'; items.push(v); });
                 renderToBox(items.reverse(), divFb, '#1877F2');
-            });
-
-            // Listener cho nhánh CHỢ TỐT (san_tin_chotot)
-            db.ref('san_tin_chotot').limitToLast(50).on('value', snap => {
-                let items = []; snap.forEach(c => { let v = c.val(); v.id = c.key; v.path = 'san_tin_chotot'; items.push(v); });
-                renderToBox(items.reverse(), divCt, '#f59e0b');
             });
         }
 
@@ -462,7 +476,6 @@
             let html = "";
             items.forEach(item => {
                 const isRead = item.isRead ? 'read' : '';
-                // Xử lý hiển thị nếu content/phone trống
                 const title = item.title || "";
                 const phone = item.phone ? ` - 📞 ${item.phone}` : "";
                 const keyword = item.keyword ? ` [Từ khóa: ${item.keyword}]` : "";
@@ -486,8 +499,88 @@
         function markHuntedRead(path, id) { db.ref(path + '/' + id).update({ isRead: true }); }
         function deleteHunted(path, id) { if(confirm("Xóa tin này?")) db.ref(path + '/' + id).remove(); }
 
-        // Chạy hàm render khi web tải xong
         renderHuntedData();
+
+
+        // --- CHỨC NĂNG MỚI: ĐỊNH GIÁ CHỢ TỐT ---
+        function requestPriceCheck() {
+            const name = document.getElementById('price-name').value.trim();
+            const year = document.getElementById('price-year').value.trim();
+            const color = document.getElementById('price-color').value.trim();
+
+            if(!name || !year) return alert("Vui lòng nhập Tên xe và Đời xe!");
+
+            const btn = document.getElementById('btn-price');
+            btn.disabled = true;
+            btn.innerHTML = "⏳ BOT ĐANG QUÉT CHỢ TỐT...";
+            document.getElementById('price-result-card').style.display = 'none';
+
+            const requestRef = db.ref('dinh_gia_xe/requests');
+            const newRequest = requestRef.push();
+
+            newRequest.set({
+                name: name,
+                year: year,
+                color: color,
+                status: "pending",
+                createdAt: Date.now()
+            });
+
+            // Lắng nghe khi bot trả về
+            newRequest.on('value', (snap) => {
+                const data = snap.val();
+                if (data && data.status === 'completed') {
+                    btn.disabled = false;
+                    btn.innerHTML = "🎯 BẤM GIÁ LẠI";
+                    renderPriceChart(data.priceDistribution, data.totalFound);
+                    newRequest.off('value'); // Xong thì ngắt lắng nghe
+                } else if (data && data.status === 'error') {
+                    btn.disabled = false;
+                    btn.innerHTML = "🎯 THỬ LẠI";
+                    alert("Bot báo lỗi: " + data.message);
+                    newRequest.off('value');
+                }
+            });
+        }
+
+        function renderPriceChart(distribution, total) {
+            const card = document.getElementById('price-result-card');
+            const container = document.getElementById('price-results-content');
+            
+            if (!distribution || total === 0) {
+                container.innerHTML = "<p style='text-align:center; color:var(--danger); font-weight:bold;'>Không tìm thấy xe tương tự đang bán trên Chợ Tốt trong 2 tháng qua.</p>";
+                card.style.display = 'block';
+                return;
+            }
+
+            let html = `<p style="text-align:center; font-weight:900; color:var(--primary); margin-bottom:20px; font-size:14px;">🔎 TÌM THẤY ${total} XE ĐANG BÁN</p>`;
+            
+            // Lấy danh sách giá, sắp xếp tăng dần
+            const prices = Object.keys(distribution).map(Number).sort((a,b) => a-b);
+            
+            // Tìm số lượng xe cao nhất ở 1 mức giá để làm chuẩn 100% cho biểu đồ
+            const maxCount = Math.max(...Object.values(distribution));
+
+            prices.forEach(price => {
+                const count = distribution[price];
+                const percentage = Math.max((count / maxCount) * 100, 5); // Tối thiểu 5% để thấy màu
+                
+                html += `
+                <div class="price-bar-container">
+                    <div class="price-label">${price} tr</div>
+                    <div class="price-track">
+                        <div class="price-fill" style="width: ${percentage}%;"></div>
+                    </div>
+                    <div class="price-count">${count} xe</div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            card.style.display = 'block';
+            
+            // Tự động cuộn xuống kết quả
+            card.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
     </script>
 </body>
 </html>
