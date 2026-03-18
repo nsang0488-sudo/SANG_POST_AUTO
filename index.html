@@ -268,6 +268,16 @@
                     <label>Màu xe (Không bắt buộc)</label>
                     <input type="text" id="price-color" placeholder="VD: Trắng">
 
+                    <label>Số KM đã đi (ODO)</label>
+                    <input type="number" id="price-odo" placeholder="VD: 30000">
+
+                    <label>Loại hộp số</label>
+                    <select id="price-transmission">
+                        <option value="Tất cả">Tất cả</option>
+                        <option value="Số tự động">Số tự động (AT)</option>
+                        <option value="Số sàn">Số sàn (MT)</option>
+                    </select>
+
                     <button class="btn btn-main" id="btn-price" onclick="requestPriceCheck()" style="background: var(--gold-gradient); color: #fff;">🎯 BẤM GIÁ (GỌI BOT)</button>
                 </div>
 
@@ -507,6 +517,10 @@
             const name = document.getElementById('price-name').value.trim();
             const year = document.getElementById('price-year').value.trim();
             const color = document.getElementById('price-color').value.trim();
+            
+            // LẤY DỮ LIỆU MỚI THÊM
+            const odo = document.getElementById('price-odo').value.trim();
+            const transmission = document.getElementById('price-transmission').value;
 
             if(!name || !year) return alert("Vui lòng nhập Tên xe và Đời xe!");
 
@@ -518,10 +532,13 @@
             const requestRef = db.ref('dinh_gia_xe/requests');
             const newRequest = requestRef.push();
 
+            // GỬI KÈM ODO VÀ HỘP SỐ LÊN FIREBASE
             newRequest.set({
                 name: name,
                 year: year,
                 color: color,
+                odo: odo,
+                transmission: transmission,
                 status: "pending",
                 createdAt: Date.now()
             });
