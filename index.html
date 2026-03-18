@@ -135,6 +135,41 @@
 
         /* Style riêng cho trạng thái Đã Xem của Bot */
         .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
+
+        /* --- BỔ SUNG: Giao diện thẻ săn tin siêu gọn --- */
+        .card-hunted-compact {
+            padding: 10px 12px !important;
+            margin-bottom: 8px !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border-radius: 12px !important;
+        }
+        .hunted-text-box {
+            flex: 1;
+            overflow: hidden;
+        }
+        .hunted-text-box p {
+            margin: 0;
+            font-size: 13px;
+            white-space: nowrap; /* Cắt chữ trên 1 dòng */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Hiện dấu ... */
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .hunted-btns-compact {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .btn-mini {
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+            width: auto !important;
+            border-radius: 8px !important;
+        }
     </style>
 </head>
 <body>
@@ -428,10 +463,11 @@
             alert("Đã cập nhật lệnh Bot!");
         }
 
-        db.ref('san_tin').limitToLast(15).on('value', snap => {
+        // --- ĐÃ ĐỔI THÀNH LIMIT 100 VÀ GIAO DIỆN COMPACT ---
+        db.ref('san_tin').limitToLast(100).on('value', snap => {
             const div = document.getElementById('list-hunted'); div.innerHTML = "";
             let items = []; 
-            // Đã bổ sung logic lấy ID của tin để có thể Đánh dấu/Xoá
+            
             snap.forEach(c => {
                 let val = c.val();
                 val.id = c.key; 
@@ -443,12 +479,14 @@
                 const borderColor = item.isRead ? 'var(--border)' : 'var(--accent)';
                 
                 div.innerHTML += `
-                <div class="card ${readClass}" id="hunt-${item.id}" style="border-left:4px solid ${borderColor}">
-                    <p style="font-size:14px; margin:0 0 12px 0; font-weight: 500;">${item.content}</p>
-                    <div style="display: flex; gap: 8px;">
-                        <a href="${item.link}" target="_blank" class="btn btn-check" style="flex: 1.5; padding: 10px; font-size: 11px;">🌍 XEM BÀI</a>
-                        <button class="btn btn-success" style="flex: 1; padding: 10px; font-size: 11px;" onclick="markHuntedRead('${item.id}')">✔️ ĐÃ XEM</button>
-                        <button class="btn btn-danger" style="flex: 1; padding: 10px; font-size: 11px; background: #fff; border-color: var(--danger)" onclick="deleteHunted('${item.id}')">🗑️ XÓA</button>
+                <div class="card card-hunted-compact ${readClass}" id="hunt-${item.id}" style="border-left:4px solid ${borderColor}">
+                    <div class="hunted-text-box">
+                        <p>${item.content || 'Không có nội dung'}</p>
+                    </div>
+                    <div class="hunted-btns-compact">
+                        <a href="${item.link}" target="_blank" class="btn btn-check btn-mini">🌍 XEM</a>
+                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.id}')">✔️</button>
+                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.id}')">🗑️</button>
                     </div>
                 </div>`;
             });
