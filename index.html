@@ -267,6 +267,20 @@
                 <h2 class="section-title">Tin mới săn được</h2>
                 <div id="list-hunted"></div>
             </div>
+
+            <div id="tab-templates" class="tab-content">
+                <h2 class="section-title">Thêm Mẫu Đăng Bài</h2>
+                <div class="card">
+                    <label>Từ khóa xe (Tag - VD: city, xpander)</label>
+                    <input type="text" id="tpl-keyword" placeholder="Nhập 1 từ khóa viết thường...">
+                    <label>Nội dung mẫu đăng</label>
+                    <textarea id="tpl-content" style="height: 120px;" placeholder="VD: Em cần tìm mua City 2023 trắng, đi ít..."></textarea>
+                    <button class="btn btn-main" style="background: var(--green-gradient)" onclick="saveTemplate()">💾 LƯU MẪU VÀO KHO</button>
+                </div>
+                <h2 class="section-title">Kho Mẫu Hiện Có</h2>
+                <div id="list-templates"></div>
+            </div>
+
         </div>
 
         <div class="bottom-nav">
@@ -275,6 +289,7 @@
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('sellers', this)"><span class="nav-icon">🚗</span><span>BÁN</span></a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('closed', this)"><span class="nav-icon">🏆</span><span>CHỐT</span></a>
             <a href="javascript:void(0)" class="nav-item" onclick="switchTab('hunt', this)"><span class="nav-icon">🎯</span><span>SĂN</span></a>
+            <a href="javascript:void(0)" class="nav-item" onclick="switchTab('templates', this)"><span class="nav-icon">📚</span><span>MẪU</span></a>
         </div>
     </div> 
 
@@ -446,7 +461,6 @@
         db.ref('config_bot').on('value', snap => {
             if(snap.exists()){
                 const d = snap.val();
-                // Đã xoá dòng load groups
                 document.getElementById('hunt-keywords').value = d.keywords || "";
                 document.getElementById('hunt-interval').value = d.interval || 10;
             }
@@ -489,16 +503,77 @@
             });
         });
 
-        // Hàm hỗ trợ cho Bot Săn Tin
-        function markHuntedRead(id) {
-            db.ref('san_tin/' + id).update({ isRead: true });
+        function markHuntedRead(id) { db.ref('san_tin/' + id).update({ isRead: true }); }
+        function deleteHunted(id) { if(confirm("Bạn có chắc chắn muốn xóa tin này không?")) { db.ref('san_tin/' + id).remove(); } }
+
+
+        // ==========================================
+        // --- CHỨC NĂNG MỚI: QUẢN LÝ KHO MẪU ĐĂNG ---
+        // ==========================================
+
+        function saveTemplate() {
+            const keyword = document.getElementById('tpl-keyword').value.trim().toLowerCase();
+            const content = document.getElementById('tpl-content').value.trim();
+
+            if (!keyword || !content) {
+                return alert("Vui lòng nhập đầy đủ Từ khóa và Nội dung mẫu đăng!");
+            }
+
+            const newId = 'tpl_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            
+            // Lưu vào Firebase dưới node 'post_templates' (Bot sẽ đọc từ đây)
+            db.ref('post_templates/' + newId).set({
+                keyword: keyword,
+                content: content,
+                created_at: Date.now()
+            }).then(() => {
+                // Xóa rỗng form sau khi lưu thành công
+                document.getElementById('tpl-keyword').value = "";
+                document.getElementById('tpl-content').value = "";
+                alert("Đã thêm mẫu vào kho thành công!");
+            }).catch(e => {
+                alert("Lỗi khi lưu mẫu: " + e.message);
+            });
         }
-        
-        function deleteHunted(id) {
-            if(confirm("Bạn có chắc chắn muốn xóa tin này không?")) {
-                db.ref('san_tin/' + id).remove();
+
+        // Lắng nghe dữ liệu mẫu đăng từ Firebase để hiển thị ra list
+        db.ref('post_templates').on('value', snap => {
+            const div = document.getElementById('list-templates'); 
+            div.innerHTML = "";
+            let templates = []; 
+            
+            snap.forEach(c => {
+                let val = c.val();
+                val.id = c.key; 
+                templates.push(val);
+            });
+            
+            if (templates.length === 0) {
+                div.innerHTML = "<p style='text-align:center;color:#666;'>Chưa có mẫu nội dung nào.</p>";
+                return;
+            }
+
+            let html = "";
+            templates.reverse().forEach(tpl => {
+                html += `
+                <div class="card card-hunted-compact" style="border-left:4px solid #9333ea; align-items: flex-start;">
+                    <div class="hunted-text-box">
+                        <p style="white-space: normal; line-height: 1.4;"><strong style="color: #9333ea; text-transform: uppercase; margin-right: 5px;">[${tpl.keyword}]</strong>${tpl.content}</p>
+                    </div>
+                    <div class="hunted-btns-compact">
+                        <button class="btn btn-danger btn-mini" style="background:#fff; color: #ef4444; border: 1px solid #fecaca;" onclick="deleteTemplate('${tpl.id}')">🗑️ XÓA</button>
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        });
+
+        function deleteTemplate(id) {
+            if(confirm("Bạn có chắc chắn muốn xóa mẫu đăng này khỏi kho?")) { 
+                db.ref('post_templates/' + id).remove(); 
             }
         }
+
     </script>
 </body>
 </html>
