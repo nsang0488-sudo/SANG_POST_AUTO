@@ -288,7 +288,8 @@
                     
                     <button class="btn btn-check" style="margin-bottom: 20px;" onclick="addTemplateInput()">➕ THÊM NỘI DUNG MẪU</button>
 
-                    <button class="btn btn-main" style="background: var(--green-gradient)" onclick="saveCluster()">💾 LƯU CỤM NÀY</button>
+                    <button class="btn btn-main" style="background: var(--green-gradient)" id="btn-cluster-save" onclick="saveCluster()">💾 LƯU CỤM NÀY</button>
+                    <button class="btn btn-danger btn-mini" id="btn-cluster-cancel" style="display:none; margin-top:10px;" onclick="resetClusterForm()">🚫 HỦY CHỈNH SỬA</button>
                 </div>
                 <h2 class="section-title">Danh Sách Các Cụm Sẵn Sàng</h2>
                 <div id="list-clusters"></div>
@@ -315,6 +316,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const IMGBB_KEY = "a4b55574ff83037588382d5f83783ea1";
+        let editingClusterId = null;
 
         function verifyAccess() {
             if (document.getElementById('access-key').value === '190525') {
@@ -560,211 +562,89 @@
         function saveCluster() {
             const name = document.getElementById('cluster-name').value.trim();
             if (!name) return alert("Vui lòng nhập Tên Cụm!");
-            
-            // Lấy danh sách nhóm (Tên + Link)
             const groupNodes = document.querySelectorAll('#group-inputs-container .dynamic-input-group');
             let groups = [];
             groupNodes.forEach(node => {
                 let gName = node.querySelector('.cluster-group-name').value.trim();
                 let gLink = node.querySelector('.cluster-group-link').value.trim();
-                if(gLink !== '') {
-                    groups.push({
-                        name: gName || "Group Chưa Đặt Tên",
-                        link: gLink,
-                        last_posted: 0
-                    });
-                }
+                if(gLink !== '') groups.push({ name: gName || "Group Chưa Đặt Tên", link: gLink, last_posted: 0 });
             });
-
-            // Lấy danh sách nội dung mẫu
             const templateInputs = document.querySelectorAll('.cluster-template-input');
             let templates = [];
-            templateInputs.forEach(input => {
-                if(input.value.trim() !== '') templates.push(input.value.trim());
-            });
-
+            templateInputs.forEach(input => { if(input.value.trim() !== '') templates.push(input.value.trim()); });
             if (groups.length === 0) return alert("Vui lòng nhập ít nhất 1 Group!");
             if (templates.length === 0) return alert("Vui lòng nhập ít nhất 1 nội dung mẫu!");
 
-            const newId = 'cluster_' + Date.now();
-            
-            db.ref('marketing_clusters/' + newId).set({
-                name: name,
-                groups: groups,
-                templates: templates,
-                created_at: Date.now()
-            }).then(() => {
-                document.getElementById('cluster-name').value = "";
-                
-                document.getElementById('group-inputs-container').innerHTML = `
-                    <div class="dynamic-input-group" style="position: relative; margin-bottom: 12px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
-                        <input type="text" class="cluster-group-name" placeholder="Tên Group (VD: Hội Vios...)" style="margin-bottom: 8px;">
-                        <input type="text" class="cluster-group-link" placeholder="https://facebook.com/groups/..." style="margin-bottom: 0;">
-                    </div>
-                `;
-                
-                document.getElementById('template-inputs-container').innerHTML = `
-                    <div class="dynamic-input-group" style="position: relative; margin-bottom: 10px;">
-                        <textarea class="cluster-template-input" style="height: 80px; margin-bottom: 0;" placeholder="Nội dung 1..."></textarea>
-                    </div>
-                `;
-                alert("Đã lưu Cụm và Kho mẫu thành công!");
+            const targetId = editingClusterId || ('cluster_' + Date.now());
+            const data = { name: name, groups: groups, templates: templates };
+            if(!editingClusterId) data.created_at = Date.now();
+
+            db.ref('marketing_clusters/' + targetId).update(data).then(() => {
+                resetClusterForm();
+                alert(editingClusterId ? "Đã cập nhật cụm!" : "Đã lưu Cụm thành công!");
             });
         }
 
-        db.ref('marketing_clusters').on('value', snap => {
-            globalClusters = [];
-            snap.forEach(c => {
-                let val = c.val();
-                val.id = c.key; 
-                globalClusters.push(val);
+        function resetClusterForm() {
+            editingClusterId = null;
+            document.getElementById('cluster-name').value = "";
+            document.getElementById('group-inputs-container').innerHTML = `<div class="dynamic-input-group" style="position: relative; margin-bottom: 12px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border);"><input type="text" class="cluster-group-name" placeholder="Tên Group (VD: Hội Vios...)" style="margin-bottom: 8px;"><input type="text" class="cluster-group-link" placeholder="https://facebook.com/groups/..." style="margin-bottom: 0;"></div>`;
+            document.getElementById('template-inputs-container').innerHTML = `<div class="dynamic-input-group" style="position: relative; margin-bottom: 10px;"><textarea class="cluster-template-input" style="height: 80px; margin-bottom: 0;" placeholder="Nội dung 1..."></textarea></div>`;
+            const btn = document.getElementById('btn-cluster-save');
+            btn.innerHTML = "💾 LƯU CỤM NÀY"; btn.style.background = "var(--green-gradient)";
+            document.getElementById('btn-cluster-cancel').style.display = "none";
+        }
+
+        function loadClusterToEdit(id) {
+            const cluster = globalClusters.find(c => c.id === id);
+            if(!cluster) return;
+            editingClusterId = id;
+            document.getElementById('cluster-name').value = cluster.name;
+            const gc = document.getElementById('group-inputs-container'); gc.innerHTML = "";
+            (cluster.groups || []).forEach(g => {
+                const div = document.createElement('div'); div.className = 'dynamic-input-group'; div.style.cssText = 'position: relative; margin-bottom: 12px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border);';
+                div.innerHTML = `<input type="text" class="cluster-group-name" value="${g.name}" style="margin-bottom: 8px;"><input type="text" class="cluster-group-link" value="${g.link}" style="margin-bottom: 0;"><button class="btn btn-danger btn-mini" style="position: absolute; right: 12px; top: 12px; padding: 4px 8px; width: auto; font-size: 10px; background: #fee2e2; color: #ef4444; border: none;" onclick="this.parentElement.remove()">❌</button>`;
+                gc.appendChild(div);
             });
+            const tc = document.getElementById('template-inputs-container'); tc.innerHTML = "";
+            (cluster.templates || []).forEach(t => {
+                const div = document.createElement('div'); div.className = 'dynamic-input-group'; div.style.cssText = 'position: relative; margin-bottom: 10px;';
+                div.innerHTML = `<textarea class="cluster-template-input" style="height: 80px; margin-bottom: 0;">${t}</textarea><button class="btn btn-danger btn-mini" style="position: absolute; right: 8px; top: 8px; padding: 4px 8px; width: auto; font-size: 10px; background: #fee2e2; color: #ef4444; border: none;" onclick="this.parentElement.remove()">❌</button>`;
+                tc.appendChild(div);
+            });
+            const btn = document.getElementById('btn-cluster-save'); btn.innerHTML = "💾 CẬP NHẬT CỤM"; btn.style.background = "var(--purple-gradient)";
+            document.getElementById('btn-cluster-cancel').style.display = "block";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        db.ref('marketing_clusters').on('value', snap => {
+            globalClusters = []; snap.forEach(c => { let val = c.val(); val.id = c.key; globalClusters.push(val); });
             renderClusters();
         });
 
         function renderClusters() {
-            const div = document.getElementById('list-clusters'); 
-            div.innerHTML = "";
-            
-            if (globalClusters.length === 0) {
-                div.innerHTML = "<p style='text-align:center;color:#666;'>Chưa có Cụm nào.</p>";
-                return;
-            }
-
-            let clustersToRender = [...globalClusters].reverse();
-            let html = "";
-            const now = Date.now();
-            const TWO_HOURS = 2 * 60 * 60 * 1000;
-
-            clustersToRender.forEach(cluster => {
-                html += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                        <strong style="color:var(--primary); font-size: 15px; text-transform: uppercase;">${cluster.name}</strong>
-                    </div>
-
-                    <div style="margin-bottom: 12px;">
-                        <strong style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Các Group trong Cụm:</strong>
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-                `;
-
-                // Xử lý dữ liệu cũ nếu trước đó dùng 'links' thay vì 'groups'
-                let groupList = cluster.groups || [];
-                if(cluster.links && groupList.length === 0) {
-                    groupList = cluster.links.map(l => ({ name: "Group cũ", link: l, last_posted: cluster.last_posted || 0 }));
-                }
-
-                // Render từng group với viền đỏ/xanh riêng biệt
-                groupList.forEach((g, index) => {
-                    let isPosted = g.last_posted > 0;
-                    let borderColor = "var(--border)";
-                    let statusText = "Chưa đăng";
-                    
-                    if (isPosted) {
-                        let timeDiff = now - g.last_posted;
-                        if (timeDiff < TWO_HOURS) {
-                            borderColor = "var(--danger)"; // Đỏ nếu chưa qua 2 tiếng
-                            statusText = getElapsedTime(g.last_posted);
-                        } else {
-                            borderColor = "var(--success)"; // Xanh nếu qua 2 tiếng
-                            statusText = "Đã qua 2 tiếng - Có thể đăng lại";
-                        }
-                    }
-
-                    html += `
-                        <div style="border: 2px solid ${borderColor}; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; transition: border 0.5s; background: #fff;">
-                            <div style="flex: 1; overflow: hidden; padding-right: 10px;">
-                                <strong style="font-size: 13px; color: var(--text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${g.name}</strong>
-                                <a href="${g.link}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: none;">🔗 Chuyển đến Group</a>
-                                <div style="font-size: 10px; color: ${borderColor === 'var(--danger)' ? 'var(--danger)' : 'var(--success)'}; margin-top: 2px; font-weight: bold;">${statusText}</div>
-                            </div>
-                            <button class="btn btn-success btn-mini" style="width: auto; flex-shrink: 0;" onclick="markGroupPosted('${cluster.id}', ${index})">ĐÃ ĐĂNG</button>
-                        </div>
-                    `;
+            const div = document.getElementById('list-clusters'); div.innerHTML = "";
+            if (globalClusters.length === 0) { div.innerHTML = "<p style='text-align:center;color:#666;'>Chưa có Cụm nào.</p>"; return; }
+            let html = ""; const now = Date.now(); const TWO_HOURS = 2 * 60 * 60 * 1000;
+            [...globalClusters].reverse().forEach(cluster => {
+                html += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;"><strong style="color:var(--primary); font-size: 15px; text-transform: uppercase;">${cluster.name}</strong></div><div style="margin-bottom: 12px;"><strong style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Các Group trong Cụm:</strong><div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">`;
+                let groupList = cluster.groups || []; (groupList).forEach((g, index) => {
+                    let isPosted = g.last_posted > 0; let borderColor = "var(--border)"; let statusText = "Chưa đăng";
+                    if (isPosted) { let timeDiff = now - g.last_posted; if (timeDiff < TWO_HOURS) { borderColor = "var(--danger)"; statusText = getElapsedTime(g.last_posted); } else { borderColor = "var(--success)"; statusText = "Đã qua 2 tiếng - Có thể đăng lại"; } }
+                    html += `<div style="border: 2px solid ${borderColor}; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: #fff;"><div style="flex: 1; overflow: hidden; padding-right: 10px;"><strong style="font-size: 13px; color: var(--text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${g.name}</strong><a href="${g.link}" target="_blank" style="font-size: 11px; color: var(--primary); text-decoration: none;">🔗 Chuyển đến Group</a><div style="font-size: 10px; color: ${borderColor === 'var(--danger)' ? 'var(--danger)' : 'var(--success)'}; margin-top: 2px; font-weight: bold;">${statusText}</div></div><button class="btn btn-success btn-mini" style="width: auto; flex-shrink: 0;" onclick="markGroupPosted('${cluster.id}', ${index})">ĐÃ ĐĂNG</button></div>`;
                 });
-
-                html += `
-                        </div>
-                    </div>
-                    
-                    <hr style="border:none; border-top:1px dashed var(--border); margin: 15px 0;">
-                    <strong style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; display:block; margin-bottom: 8px;">Kho mẫu cho Cụm này:</strong>
-                    <div style="max-height: 250px; overflow-y: auto;">
-                `;
-
-                if(cluster.templates && cluster.templates.length > 0) {
-                    cluster.templates.forEach((t) => {
-                        html += `
-                        <div style="background:#f8fafc; padding:12px; border-radius:10px; margin-bottom:10px; position:relative; border: 1px solid var(--border);">
-                            <p style="margin:0; font-size:13px; white-space:pre-wrap; padding-right: 60px;">${t}</p>
-                            <button class="btn btn-main btn-mini" style="position:absolute; right:10px; top:10px; width:auto; padding:6px 12px;" onclick="copyText(this, \`${t.replace(/`/g, '\\`')}\`)">COPY</button>
-                        </div>`;
-                    });
-                } else {
-                    html += `<p style="font-size:12px; color:#999;">Cụm này chưa có mẫu nào.</p>`;
-                }
-
-                html += `
-                    </div>
-                    <div style="margin-top:15px; text-align:right;">
-                        <button class="btn btn-danger btn-mini" style="background:transparent; border: 1px solid var(--danger);" onclick="deleteCluster('${cluster.id}')">🗑️ XÓA CỤM</button>
-                    </div>
-                </div>`;
+                html += `</div></div><hr style="border:none; border-top:1px dashed var(--border); margin: 15px 0;"><strong style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; display:block; margin-bottom: 8px;">Kho mẫu cho Cụm này:</strong><div style="max-height: 250px; overflow-y: auto;">`;
+                if(cluster.templates && cluster.templates.length > 0) { cluster.templates.forEach((t) => { html += `<div style="background:#f8fafc; padding:12px; border-radius:10px; margin-bottom:10px; position:relative; border: 1px solid var(--border);"><p style="margin:0; font-size:13px; white-space:pre-wrap; padding-right: 60px;">${t}</p><button class="btn btn-main btn-mini" style="position:absolute; right:10px; top:10px; width:auto; padding:6px 12px;" onclick="copyText(this, \`${t.replace(/`/g, '\\`')}\`)">COPY</button></div>`; }); }
+                html += `</div><div style="margin-top:15px; text-align:right; display:flex; gap:10px; justify-content:flex-end;"><button class="btn btn-check btn-mini" onclick="loadClusterToEdit('${cluster.id}')">✏️ SỬA CỤM</button><button class="btn btn-danger btn-mini" style="background:transparent; border: 1px solid var(--danger);" onclick="deleteCluster('${cluster.id}')">🗑️ XÓA</button></div></div>`;
             });
             div.innerHTML = html;
         }
 
-        // Tự động kiểm tra thời gian mỗi 1 phút để cập nhật màu viền
-        setInterval(() => {
-            if (document.getElementById('tab-templates').classList.contains('active')) {
-                renderClusters();
-            }
-        }, 60000);
-
-        function markGroupPosted(clusterId, groupIndex) { 
-            db.ref(`marketing_clusters/${clusterId}/groups/${groupIndex}`).update({ last_posted: Date.now() }); 
-        }
-
-        function deleteCluster(id) {
-            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ Cụm này khỏi danh sách?")) { 
-                db.ref('marketing_clusters/' + id).remove(); 
-            }
-        }
-
-        function copyText(btn, text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    let old = btn.innerText;
-                    btn.innerText = "ĐÃ COPY!";
-                    btn.style.background = "var(--success)";
-                    setTimeout(() => {
-                        btn.innerText = old;
-                        btn.style.background = "var(--accent-gradient)";
-                    }, 2000);
-                });
-            } else {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                let old = btn.innerText;
-                btn.innerText = "ĐÃ COPY!";
-                setTimeout(() => btn.innerText = old, 2000);
-            }
-        }
-
-        function getElapsedTime(timestamp) {
-            if(!timestamp) return "";
-            const diff = Date.now() - timestamp;
-            const mins = Math.floor(diff / 60000);
-            if(mins < 1) return `Vừa đăng`;
-            if(mins < 60) return `Đã đăng ${mins} phút trước`;
-            const hrs = Math.floor(mins / 60);
-            return `Đã đăng ${hrs} giờ ${mins % 60} phút trước`;
-        }
-
+        setInterval(() => { if (document.getElementById('tab-templates').classList.contains('active')) renderClusters(); }, 60000);
+        function markGroupPosted(clusterId, groupIndex) { db.ref(`marketing_clusters/${clusterId}/groups/${groupIndex}`).update({ last_posted: Date.now() }); }
+        function deleteCluster(id) { if(confirm("Bạn có chắc chắn muốn xóa toàn bộ Cụm này?")) { db.ref('marketing_clusters/' + id).remove(); } }
+        function copyText(btn, text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => { let old = btn.innerText; btn.innerText = "ĐÃ COPY!"; btn.style.background = "var(--success)"; setTimeout(() => { btn.innerText = old; btn.style.background = "var(--accent-gradient)"; }, 2000); }); } else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); let old = btn.innerText; btn.innerText = "ĐÃ COPY!"; setTimeout(() => btn.innerText = old, 2000); } }
+        function getElapsedTime(timestamp) { if(!timestamp) return ""; const diff = Date.now() - timestamp; const mins = Math.floor(diff / 60000); if(mins < 1) return `Vừa đăng`; if(mins < 60) return `Đã đăng ${mins} phút trước`; const hrs = Math.floor(mins / 60); return `Đã đăng ${hrs} giờ ${mins % 60} phút trước`; }
     </script>
 </body>
 </html>
