@@ -271,8 +271,16 @@
                     <input type="text" id="grp-name" placeholder="Nhập tên hoặc ID Group...">
                     <label>Link Group (Để mở trực tiếp)</label>
                     <input type="text" id="grp-link" placeholder="https://facebook.com/groups/...">
-                    <label>Các mẫu đăng (Mỗi mẫu cách nhau bằng dấu ---)</label>
-                    <textarea id="grp-templates" style="height: 120px;" placeholder="Mẫu 1\n---\nMẫu 2\n---\nMẫu 3"></textarea>
+                    
+                    <label>Các nội dung mẫu đăng</label>
+                    <div id="template-inputs-container">
+                        <div class="template-input-group" style="position: relative; margin-bottom: 10px;">
+                            <textarea class="grp-template-input" style="height: 80px; margin-bottom: 0;" placeholder="Nội dung 1..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-check" style="margin-bottom: 20px;" onclick="addTemplateInput()">➕ THÊM NỘI DUNG MẪU</button>
+
                     <button class="btn btn-main" style="background: var(--green-gradient)" onclick="saveGroupTemplate()">💾 LƯU GROUP MỚI</button>
                 </div>
                 <h2 class="section-title">Danh Sách Group Sẵn Sàng</h2>
@@ -481,8 +489,19 @@
                 items.push(val);
             });
             
-            // Xếp tin mới nhất lên đầu dựa vào ID (chứa timestamp)
-            items.sort((a, b) => b.id.localeCompare(a.id));
+            // THUẬT TOÁN SẮP XẾP MỚI: Ưu tiên tin chưa đọc lên đầu, sau đó xếp theo thời gian mới nhất
+            items.sort((a, b) => {
+                let aUnread = a.isRead ? 0 : 1; // 1 là chưa đọc, 0 là đã đọc
+                let bUnread = b.isRead ? 0 : 1;
+                
+                // Nếu 1 cái đọc rồi, 1 cái chưa đọc -> xếp chưa đọc lên trước
+                if (aUnread !== bUnread) {
+                    return bUnread - aUnread; 
+                }
+                
+                // Nếu cùng đã đọc hoặc cùng chưa đọc -> xếp theo id (thời gian) mới nhất
+                return b.id.localeCompare(a.id);
+            });
 
             items.forEach(item => {
                 const readClass = item.isRead ? 'read' : '';
@@ -512,15 +531,38 @@
 
         let globalGroups = [];
 
+        // Thêm trường nhập nội dung mẫu
+        function addTemplateInput() {
+            const container = document.getElementById('template-inputs-container');
+            const count = container.querySelectorAll('.grp-template-input').length;
+            
+            const div = document.createElement('div');
+            div.className = 'template-input-group';
+            div.style.cssText = 'position: relative; margin-bottom: 10px; animation: fadeIn 0.3s ease;';
+            div.innerHTML = `
+                <textarea class="grp-template-input" style="height: 80px; margin-bottom: 0;" placeholder="Nội dung ${count + 1}..."></textarea>
+                <button class="btn btn-danger btn-mini" style="position: absolute; right: 8px; top: 8px; padding: 4px 8px; width: auto; font-size: 10px; background: #fee2e2; color: #ef4444; border: none;" onclick="this.parentElement.remove()">❌</button>
+            `;
+            container.appendChild(div);
+        }
+
         function saveGroupTemplate() {
             const name = document.getElementById('grp-name').value.trim();
             const link = document.getElementById('grp-link').value.trim();
-            const tmplText = document.getElementById('grp-templates').value.trim();
-
+            
             if (!name || !link) return alert("Vui lòng nhập Tên và Link Group!");
             
-            // Tách các mẫu bằng dấu ---
-            let templates = tmplText.split('---').map(t => t.trim()).filter(t => t);
+            // Lấy tất cả nội dung từ các ô textarea
+            const inputs = document.querySelectorAll('.grp-template-input');
+            let templates = [];
+            
+            inputs.forEach(input => {
+                if(input.value.trim() !== '') {
+                    templates.push(input.value.trim());
+                }
+            });
+
+            if (templates.length === 0) return alert("Vui lòng nhập ít nhất 1 nội dung mẫu!");
 
             const newId = 'grp_' + Date.now();
             
@@ -531,9 +573,16 @@
                 last_posted: 0,
                 created_at: Date.now()
             }).then(() => {
+                // Đặt lại form sau khi lưu thành công
                 document.getElementById('grp-name').value = "";
                 document.getElementById('grp-link').value = "";
-                document.getElementById('grp-templates').value = "";
+                
+                // Trả về duy nhất 1 ô nhập nội dung
+                document.getElementById('template-inputs-container').innerHTML = `
+                    <div class="template-input-group" style="position: relative; margin-bottom: 10px;">
+                        <textarea class="grp-template-input" style="height: 80px; margin-bottom: 0;" placeholder="Nội dung 1..."></textarea>
+                    </div>
+                `;
                 alert("Đã lưu Group và Kho mẫu thành công!");
             });
         }
