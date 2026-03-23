@@ -133,36 +133,35 @@
 
         .card.read { opacity: 0.6; background: #f8fafc; border-left-color: var(--border) !important; filter: grayscale(0.5); }
 
-        /* --- SỬA CSS PHẦN SĂN TIN CHO ĐẦY ĐỦ NỘI DUNG --- */
         .card-hunted-compact {
-            padding: 12px !important;
-            margin-bottom: 12px !important;
+            padding: 10px 12px !important;
+            margin-bottom: 8px !important;
             display: flex;
-            flex-direction: column; /* Đổi thành xếp dọc để hiển thị đủ chữ */
+            align-items: center;
+            justify-content: space-between;
             gap: 10px;
             border-radius: 12px !important;
         }
         .hunted-text-box {
-            width: 100%;
+            flex: 1;
+            overflow: hidden;
         }
         .hunted-text-box p {
             margin: 0;
             font-size: 13px;
-            white-space: pre-wrap; /* Cho phép xuống dòng tự nhiên */
-            word-break: break-word;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
             color: var(--text-main);
             font-weight: 500;
-            line-height: 1.5;
         }
         .hunted-btns-compact {
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap; /* Cho phép các nút tự rớt dòng nếu không đủ chỗ */
-            justify-content: flex-end;
-            width: 100%;
+            gap: 5px;
+            flex-shrink: 0;
         }
         .btn-mini {
-            padding: 8px 12px !important;
+            padding: 6px 10px !important;
             font-size: 11px !important;
             width: auto !important;
             border-radius: 8px !important;
@@ -261,6 +260,18 @@
                     <input type="number" id="hunt-interval" value="10">
                     <button class="btn btn-main" style="background: var(--purple-gradient)" onclick="saveBotSettings()">⚙️ CẬP NHẬT LỆNH</button>
                 </div>
+                
+                <h2 class="section-title">Phân Tích Bắt Số Nhanh</h2>
+                <div class="card">
+                    <label>Dán nội dung bài viết vào đây</label>
+                    <textarea id="hunt-parser" style="height: 100px; margin-bottom: 0;" placeholder="VD: Cần bán Xpander liên hệ 090.123.4567..."></textarea>
+                    
+                    <div id="parser-actions" style="display: none; gap: 10px; margin-top: 15px;">
+                        <a id="btn-zalo-link" href="#" target="_blank" class="btn btn-main" style="background: #0068ff; flex: 1; text-decoration: none; box-shadow: 0 4px 15px rgba(0, 104, 255, 0.3);">💬 ZALO</a>
+                        <a id="btn-call-link" href="#" class="btn btn-success" style="flex: 1; text-decoration: none;">📞 GỌI LUÔN</a>
+                    </div>
+                </div>
+
                 <h2 class="section-title">Tin mới săn được</h2>
                 <div id="list-hunted"></div>
             </div>
@@ -489,11 +500,6 @@
             alert("Đã cập nhật lệnh Bot!");
         }
 
-        // --- HÀM TÌM VÀ ĐỔI TRẠNG THÁI THEO DÕI ---
-        function toggleFollowHunted(id, isFollowed) {
-            db.ref('san_tin/' + id).update({ isFollowed: !isFollowed });
-        }
-
         db.ref('san_tin').limitToLast(100).on('value', snap => {
             const div = document.getElementById('list-hunted'); div.innerHTML = "";
             let items = []; 
@@ -513,46 +519,17 @@
 
             items.forEach(item => {
                 const readClass = item.isRead ? 'read' : '';
-                let borderColor = item.isRead ? 'var(--border)' : 'var(--accent)';
-                let isFollowed = item.isFollowed || false;
+                const borderColor = item.isRead ? 'var(--border)' : 'var(--accent)';
                 
-                // Trích xuất SĐT (Tìm dải 10 số bắt đầu bằng 03,05,07,08,09 kể cả có khoảng trắng)
-                let foundPhone = null;
-                if (item.content) {
-                    const match = item.content.match(/(0[35789](?:[\s\.]?\d){8})\b/);
-                    if (match) {
-                        foundPhone = match[0].replace(/[\s\.]/g, ''); // Xóa khoảng trắng để tạo link
-                    }
-                }
-
-                let phoneHtml = "";
-                if (foundPhone) {
-                    phoneHtml = `
-                    <div style="margin-top: 8px; padding: 8px; background: #e0f2fe; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 13px; font-weight: bold; color: #0284c7;">SĐT: ${foundPhone}</span>
-                        <div style="display: flex; gap: 5px;">
-                            <a href="https://zalo.me/${foundPhone}" target="_blank" class="zalo-icon" style="margin:0; width: 28px; height: 28px;"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" style="width: 18px; height: 18px;"></a>
-                            <a href="tel:${foundPhone}" class="btn btn-main btn-mini" style="background: var(--green-gradient); padding: 6px 10px !important; text-decoration: none; margin: 0;">📞 GỌI</a>
-                        </div>
-                    </div>`;
-                }
-
-                // Xử lý viền xanh nếu được theo dõi
-                let containerStyle = isFollowed 
-                    ? `border: 2px solid var(--success) !important; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);` 
-                    : `border-left: 4px solid ${borderColor}`;
-
                 div.innerHTML += `
-                <div class="card card-hunted-compact ${readClass}" id="hunt-${item.id}" style="${containerStyle}">
+                <div class="card card-hunted-compact ${readClass}" id="hunt-${item.id}" style="border-left:4px solid ${borderColor}">
                     <div class="hunted-text-box">
                         <p><strong style="color: var(--danger); text-transform: uppercase; margin-right: 5px;">[${item.keyword ? item.keyword : 'TIN MỚI'}]</strong>${item.content || 'Không có nội dung'}</p>
-                        ${phoneHtml}
                     </div>
                     <div class="hunted-btns-compact">
-                        <button class="btn btn-check btn-mini" onclick="toggleFollowHunted('${item.id}', ${isFollowed})" style="${isFollowed ? 'background: #dcfce7; color: #166534; border-color: #bbf7d0;' : ''}">${isFollowed ? '✅ ĐANG THEO DÕI' : '⭐ THEO DÕI'}</button>
-                        <a href="${item.link}" target="_blank" class="btn btn-check btn-mini">🌍 XEM LINK</a>
-                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.id}')">✔️ ĐÃ XEM</button>
-                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.id}')">🗑️ XÓA</button>
+                        <a href="${item.link}" target="_blank" class="btn btn-check btn-mini">🌍 XEM</a>
+                        <button class="btn btn-success btn-mini" onclick="markHuntedRead('${item.id}')">✔️</button>
+                        <button class="btn btn-danger btn-mini" style="background:#fff" onclick="deleteHunted('${item.id}')">🗑️</button>
                     </div>
                 </div>`;
             });
@@ -560,6 +537,31 @@
 
         function markHuntedRead(id) { db.ref('san_tin/' + id).update({ isRead: true }); }
         function deleteHunted(id) { if(confirm("Bạn có chắc chắn muốn xóa tin này không?")) { db.ref('san_tin/' + id).remove(); } }
+
+
+        // --- CODE MỚI THÊM: PHÂN TÍCH SDT TỪ ĐOẠN VĂN ---
+        document.getElementById('hunt-parser').addEventListener('input', function() {
+            const text = this.value;
+            // Xóa hết dấu phẩy, chấm, gạch ngang, khoảng trắng để tìm sdt cho dễ
+            const cleanText = text.replace(/[\.\s\-\,]/g, ''); 
+            // Tìm chuỗi 10 số bắt đầu bằng 0 và các đầu số hiện tại (3,5,7,8,9)
+            const phoneMatch = cleanText.match(/(0[35789]\d{8})/); 
+            
+            const actionsDiv = document.getElementById('parser-actions');
+            const btnZalo = document.getElementById('btn-zalo-link');
+            const btnCall = document.getElementById('btn-call-link');
+
+            if (phoneMatch && phoneMatch[0]) {
+                const phone = phoneMatch[0];
+                actionsDiv.style.display = 'flex';
+                btnZalo.href = `https://zalo.me/${phone}`;
+                btnCall.href = `tel:${phone}`;
+                btnZalo.innerHTML = `💬 ZALO (${phone})`;
+                btnCall.innerHTML = `📞 GỌI (${phone})`;
+            } else {
+                actionsDiv.style.display = 'none';
+            }
+        });
 
 
         // ==========================================
