@@ -272,7 +272,7 @@
                     </div>
                 </div>
 
-                <h2 class="section-title">Tin mới săn được</h2>
+                <h2 class="section-title">Tin mới săn được <button class="btn btn-danger btn-mini" style="margin-left: auto; width: auto; padding: 4px 10px;" onclick="deleteAllHunted()">🗑️ XÓA TẤT CẢ</button></h2>
                 <div id="list-hunted"></div>
             </div>
 
@@ -550,6 +550,7 @@
 
         function markHuntedRead(id) { db.ref('san_tin/' + id).update({ isRead: true }); }
         function deleteHunted(id) { if(confirm("Bạn có chắc chắn muốn xóa tin này không?")) { db.ref('san_tin/' + id).remove(); } }
+        function deleteAllHunted() { if(confirm("Bạn có chắc chắn muốn xóa TẤT CẢ tin săn được không?")) { db.ref('san_tin').remove(); } }
 
 
         // --- CODE MỚI THÊM: PHÂN TÍCH SDT TỪ ĐOẠN VĂN ---
